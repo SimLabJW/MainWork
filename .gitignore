@@ -97,3 +97,10 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# SimulationVisual 폴더 전체 무시
+Simulation(UnityVisual)/SimulationVisual/
+
+# 단, 00.Scripts 폴더만 추적
+!Simulation(UnityVisual)/SimulationVisual/Assets/00.Scripts/
+!Simulation(UnityVisual)/SimulationVisual/Assets/00.Scripts/**
