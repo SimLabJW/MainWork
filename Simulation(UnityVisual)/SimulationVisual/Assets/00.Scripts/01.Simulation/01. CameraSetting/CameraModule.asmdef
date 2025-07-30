@@ -1,0 +1,7 @@
+{
+  "name": "CameraModule",
+  "references": [
+    "CoreScript",
+    "Exporter"
+  ]
+}

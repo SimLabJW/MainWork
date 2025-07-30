@@ -1,0 +1,9 @@
+{
+	"name": "Exporter",
+	"references": [
+	"CoreScript",
+    "glTFast",
+    "glTFast.Export",
+	"WaterObejct"
+  ]
+}

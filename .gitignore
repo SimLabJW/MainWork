@@ -98,9 +98,13 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
-# SimulationVisual 폴더 전체 무시
-Simulation(UnityVisual)/SimulationVisual/
+# 00.Scripts 폴더만 추적하고 나머지는 무시하려면, 먼저 예외(!)를 위에 두고, 그 다음 전체 무시를 아래에 둬야 합니다.
 
-# 단, 00.Scripts 폴더만 추적
+# SimulationVisual 폴더 전체를 무시하지 않고, 00.Scripts 폴더만 추적하도록 설정
+# 1. SimulationVisual 하위 모든 파일/폴더 무시
+Simulation(UnityVisual)/SimulationVisual/*
+
+# 2. 단, 00.Scripts 폴더와 그 하위는 추적
+!Simulation(UnityVisual)/SimulationVisual/Assets/
 !Simulation(UnityVisual)/SimulationVisual/Assets/00.Scripts/
 !Simulation(UnityVisual)/SimulationVisual/Assets/00.Scripts/**

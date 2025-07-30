@@ -1,0 +1,8 @@
+{
+	"name": "WaterObejct",
+	"references": [
+	"CoreScript",
+	"Unity.RenderPipelines.HighDefinition.Runtime",
+	"Unity.Mathematics"
+  ]
+}
