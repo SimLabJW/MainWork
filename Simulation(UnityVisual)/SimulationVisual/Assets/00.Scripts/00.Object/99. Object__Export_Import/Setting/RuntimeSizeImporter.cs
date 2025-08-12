@@ -2,57 +2,85 @@ using GLTFast;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 public class RuntimeSizeImporter : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
     {
-        GameManager.simulation.ImportAgentSizeAction -= CaculateSize;
-        GameManager.simulation.ImportAgentSizeAction += CaculateSize;
+        GameManager.createScenario.ImportAgentSizeAction -= CaculateSize;
+        GameManager.createScenario.ImportAgentSizeAction += CaculateSize;
     }
 
     // Comfirm Object Size
-    public async void CaculateSize(string path, string fileName, Transform Position, Transform Parent)
+    public async void CaculateSize(string fileId, string fileName, Transform Position, Transform Parent, string table)
     {
-        GameManager.simulation.maxFigure = await StartSize(path, fileName, Position, Parent);
+        GameManager.createScenario.maxFigure = await StartSize(fileId, fileName, Position, Parent, table);
     }
-    public async Task<float> StartSize(string path, string fileName, Transform Position, Transform Parent)
+    public async Task<float> StartSize(string fileId, string fileName, Transform Position, Transform Parent, string table)
     {
-        return await ImportSizeModel(path, fileName, Position, Parent);
+        return await ImportSizeModel(fileId, fileName, Position, Parent, table);
     }
 
-    public async Task<float> ImportSizeModel(string path, string fileName, Transform Position, Transform Parent)
+    public async Task<float> ImportSizeModel(string fileId, string fileName, Transform Position, Transform Parent, string table)
     {
-        int childCountBefore = Parent.childCount;
+        var tcs = new TaskCompletionSource<bool>();
 
-        string glbPath = Path.Combine(path, fileName + ".glb");
-        var gltf = new GltfImport();
-
-        bool success = await gltf.Load(glbPath);
-        if (!success) return -1f;
-
-        success = await gltf.InstantiateMainSceneAsync(Position);
-        if (!success) return -1f;
-
-        GameObject gltfast_object = null;
-
-        for (int i = childCountBefore; i < Parent.childCount; i++)
+        IEnumerator WaitForComm()
         {
-            Transform child = Parent.GetChild(i);
-            string containName = child.name;
-
-            if (containName.Contains("Agent"))
-            {
-                gltfast_object = child.gameObject;
-                Debug.Log($"gltfast_obejct name : {gltfast_object.name}");
-                break;
-            }
+            GameManager.communication.Communication(table, new List<string> { "data" }, new Dictionary<string, object> { { "id", fileId } }, "GET");
+            yield return new WaitForSeconds(1.5f);
+            tcs.SetResult(true);
         }
+
+        // 코루틴 시작
+        StartCoroutine(WaitForComm());
+
+        // 통신이 끝날 때까지 대기
+        await tcs.Task;
+
+        string urlResult = GameManager.communication.Url_result;
+
+        byte[] glbBytes = null;
+        try
+        {
+            glbBytes = Convert.FromBase64String(urlResult);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"GLB base64 디코딩 실패: {e.Message}");
+            return -1f;
+        }
+
+        var gltf = new GltfImport();
+        bool success = false;
+        try
+        {
+            success = await gltf.LoadGltfBinary(glbBytes);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"GLB 로드 실패: {e.Message}");
+            return -1f;
+        }
+
+        if (!success)
+        {
+            Debug.LogError("GLB 로드에 실패했습니다.");
+            return -1f;
+        }
+
+        GameObject glbObject = new GameObject(fileName);
+
+        await gltf.InstantiateMainSceneAsync(glbObject.transform);
+
+        GameObject gltfast_object = glbObject;
 
         if (gltfast_object != null)
         {
-            Debug.Log("gltfast_obejct not null");
             Renderer[] renderers = gltfast_object.GetComponentsInChildren<Renderer>();
             if (renderers.Length > 0)
             {
@@ -61,7 +89,7 @@ public class RuntimeSizeImporter : MonoBehaviour
                     bounds.Encapsulate(renderers[i].bounds);
 
                 GameObject.Destroy(gltfast_object);
-                return Mathf.Max(bounds.size.x, bounds.size.z); // �ִ� ũ�� ��ȯ
+                return Mathf.Max(bounds.size.x, bounds.size.z); // 최대 크기 반환
             }
         }
         return -1f;

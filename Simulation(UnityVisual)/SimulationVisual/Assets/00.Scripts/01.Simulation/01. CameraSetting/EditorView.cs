@@ -23,23 +23,19 @@ public class EditorView : MonoBehaviour
     private RawImage editor_raw;
     private RectTransform editor_rectransform;
 
-    // Object Profile(name, position, object list)
-    private ObjectProfile profile = new ObjectProfile();
-
-
     void Start()
     {
-        GameManager.simulation.EditorViewFitAction -= MapSizeFitToEditorView;
-        GameManager.simulation.EditorViewFitAction += MapSizeFitToEditorView;
+        GameManager.createScenario.EditorViewFitAction -= MapSizeFitToEditorView;
+        GameManager.createScenario.EditorViewFitAction += MapSizeFitToEditorView;
 
-        GameManager.simulation.EditorViewControlAction -= ObjectSizeCalculate;
-        GameManager.simulation.EditorViewControlAction += ObjectSizeCalculate;
+        GameManager.createScenario.EditorViewControlAction -= ObjectSizeCalculate;
+        GameManager.createScenario.EditorViewControlAction += ObjectSizeCalculate;
     }
 
     // Phase 1(Env Button)
     private void MapSizeFitToEditorView(GameObject SimulationEnvObject)
     {
-        editor_raw = GameManager.simulation.sm.simulationInfo.editorInform.Editor_MapView.GetComponent<RawImage>();
+        editor_raw = GameManager.createScenario.csminfo.createScenarioInfo.editorInform.Editor_MapView.GetComponent<RawImage>();
         editor_rectransform = editor_raw.rectTransform;
 
         List<Transform> transforms = new List<Transform>();
@@ -54,93 +50,78 @@ public class EditorView : MonoBehaviour
         FitCameraToTargets(transforms);
     }
     // Phase 2(Agent Button)
-    private void ObjectSizeCalculate(string path, string fileName, Transform Position)
+    private void ObjectSizeCalculate(string fileId, string fileName, Transform Position, string table)
     {
-        // maxFigure�� �������
-        StartCoroutine(DelayedImporterSize(path, fileName, Position));
+        // maxFigure를 계산한다 & 해당 최대 크기로 된 구체를 생성
+        StartCoroutine(DelayedImporterSize(fileId, fileName, Position, table)); 
 
-        // �ش� �ִ� ũ��� �� ũ�� ����
-        StartCoroutine(StartImporterSize(path, fileName, Position));
-
-        // ���
+        // 이동
         //StartCoroutine(EditorMoveandCreate(path, fileName, Position));
         if (editorRoutine != null)
         {
             StopCoroutine(editorRoutine);
         }
-        editorRoutine = StartCoroutine(EditorMoveandCreate(path, fileName, Position));
+        editorRoutine = StartCoroutine(EditorMoveandCreate(fileId, fileName, Position, table));
     }
 
-    IEnumerator StartImporterSize(string path, string fileName, Transform Position)
+    IEnumerator StartImporterSize(string fileId, string fileName, Transform Position)
     {
-        yield return new WaitForSeconds(0.2f);
-
-        if (GameManager.simulation.sm.simulationInfo.editorInform.Agent_Size != null)
+        if (GameManager.createScenario.csminfo.createScenarioInfo.editorInform.Agent_Size != null)
         {
-            currentBoundSphere = Instantiate(GameManager.simulation.sm.simulationInfo.editorInform.Agent_Size);
-            currentBoundSphere.transform.localScale = new Vector3(GameManager.simulation.maxFigure * 2f, 0.5f, GameManager.simulation.maxFigure * 2f);
+            currentBoundSphere = Instantiate(GameManager.createScenario.csminfo.createScenarioInfo.editorInform.Agent_Size);
+            currentBoundSphere.transform.localScale = new Vector3(GameManager.createScenario.maxFigure * 2f, 0.5f, GameManager.createScenario.maxFigure * 2f);
         }
-    }
-    IEnumerator DelayedImporterSize(string path, string fileName, Transform Position)
-    {
-        
-        GameManager.simulation.ImportObject(path, fileName, GameManager.simulation.sm.simulationInfo.Simulation_ENV,
-                    GameManager.simulation.sm.simulationInfo.Simulation_ENV, "agent_size");
+
         yield return new WaitForSeconds(1f);
     }
-
-    // Phase 3(Scenario Button)
-    private void CreatePointArea()
+    IEnumerator DelayedImporterSize(string fileId, string fileName, Transform Position, string table)
     {
+        GameManager.createScenario.ImportObject(fileId, fileName, GameManager.createScenario.csminfo.createScenarioInfo.Simulation_ENV,
+                    GameManager.createScenario.csminfo.createScenarioInfo.Simulation_ENV, table);
+        yield return new WaitForSeconds(2f);
 
+        StartCoroutine(StartImporterSize(fileId, fileName, Position));
     }
-    IEnumerator EditorMoveandCreate(string path, string fileName, Transform Position)
+
+    IEnumerator EditorMoveandCreate(string fileId, string fileName, Transform Position, string table)
     {
         while (true)
         {
             HandleCameraControl();
             if (RectTransformUtility.RectangleContainsScreenPoint(editor_rectransform, Input.mousePosition) &&
-            TryGetMouseHit(out RaycastHit hit))
+                TryGetMouseHit(out RaycastHit hit))
             {
                 if (currentBoundSphere != null)
                 {
-                    //HandleBoundSpherePlacement(hit, path, fileName);
                     currentBoundSphere.transform.position = new Vector3(hit.point.x, 10f, hit.point.z);
                     if (Input.GetMouseButtonDown(0))
                     {
                         currentBoundSphere.transform.position = new Vector3(hit.point.x, 0f, hit.point.z);
 
-                        GameManager.simulation.ImportObject(path, fileName, currentBoundSphere.transform,
-                            GameManager.simulation.sm.simulationInfo.Simulation_ENV, "agent_import");
-
+                        GameManager.createScenario.Editor_AGENT = true;
+                        GameManager.createScenario.ImportAgentAction?.Invoke(fileId, fileName, currentBoundSphere.transform,
+                            GameManager.createScenario.csminfo.createScenarioInfo.Simulation_ENV, table);
 
                         Destroy(currentBoundSphere);
                         currentBoundSphere = null;
-                        //break;
+                        // break;
                     }
                 }
                 else 
                 {
-                    if (SelectAgent && GameManager.simulation.currentObeject != null
-                    && GameManager.simulation.currentObeject.tag.Contains("Agent")) 
+                    if (SelectAgent && GameManager.createScenario.currentObeject != null) 
                     { 
                         HandleAgentMovement(hit); 
                     }
 
                     else if (!SelectAgent && Input.GetMouseButtonDown(0))
                     {
-                        
                         TrySelectObject(hit);
-
                     }
                 }
-
-                
-
             }
             yield return null;
         }
-
     }
 
     // Default Content
@@ -155,7 +136,7 @@ public class EditorView : MonoBehaviour
                 (localPoint.x + editor_rectransform.rect.width / 2) / editor_rectransform.rect.width,
                 (localPoint.y + editor_rectransform.rect.height / 2) / editor_rectransform.rect.height);
 
-            Ray ray = GameManager.simulation.sm.cameraType.MapView_Editor.ViewportPointToRay(normalizedPoint);
+            Ray ray = GameManager.createScenario.csminfo.cameraType.MapView_Editor.ViewportPointToRay(normalizedPoint);
             return Physics.Raycast(ray, out hit);
         }
         return false;
@@ -175,9 +156,9 @@ public class EditorView : MonoBehaviour
     void FitCameraToTargets(List<Transform> EnvTarget)
     {
 
-        if (GameManager.simulation.sm.cameraType.MapView_Editor == null || EnvTarget == null || EnvTarget.Count == 0) return;
+        if (GameManager.createScenario.csminfo.cameraType.MapView_Editor == null || EnvTarget == null || EnvTarget.Count == 0) return;
 
-        GameManager.simulation.sm.cameraType.MapView_Editor.orthographic = true;
+        GameManager.createScenario.csminfo.cameraType.MapView_Editor.orthographic = true;
 
         Bounds bounds = new Bounds(EnvTarget[0].position, Vector3.zero);
         foreach (var t in EnvTarget)
@@ -191,8 +172,8 @@ public class EditorView : MonoBehaviour
         Vector3 center = bounds.center;
         float sizeX = bounds.size.x;
         float sizeZ = bounds.size.z;
-        float aspect = (float)GameManager.simulation.sm.cameraType.MapView_Editor.pixelWidth 
-            / GameManager.simulation.sm.cameraType.MapView_Editor.pixelHeight;
+        float aspect = (float)GameManager.createScenario.csminfo.cameraType.MapView_Editor.pixelWidth 
+            / GameManager.createScenario.csminfo.cameraType.MapView_Editor.pixelHeight;
 
         float ratio = sizeX / sizeZ;
         bool isSquare = Mathf.Abs(ratio - 1f) < squareTolerance;
@@ -211,22 +192,22 @@ public class EditorView : MonoBehaviour
 
         targetBounds = bounds;
 
-        GameManager.simulation.sm.cameraType.MapView_Editor.orthographicSize 
+        GameManager.createScenario.csminfo.cameraType.MapView_Editor.orthographicSize 
             = orthoSize;
         maxOrthoSize = orthoSize;
-        GameManager.simulation.sm.cameraType.MapView_Editor.transform.position 
+        GameManager.createScenario.csminfo.cameraType.MapView_Editor.transform.position 
             = new Vector3(center.x, center.y + 100f, center.z);
-        GameManager.simulation.sm.cameraType.MapView_Editor.transform.rotation
+        GameManager.createScenario.csminfo.cameraType.MapView_Editor.transform.rotation
             = Quaternion.Euler(90f, 0f, 0f);
     }
 
     // Phase 2 - Function ( Zoom, clickto move camera)
     private void zoom_In_Out(float scroll)
     {
-        GameManager.simulation.sm.cameraType.MapView_Editor.orthographicSize 
+        GameManager.createScenario.csminfo.cameraType.MapView_Editor.orthographicSize 
             -= scroll * zoomSpeed;
-        GameManager.simulation.sm.cameraType.MapView_Editor.orthographicSize 
-            = Mathf.Clamp(GameManager.simulation.sm.cameraType.MapView_Editor.orthographicSize, minOrthoSize, maxOrthoSize);
+        GameManager.createScenario.csminfo.cameraType.MapView_Editor.orthographicSize 
+            = Mathf.Clamp(GameManager.createScenario.csminfo.cameraType.MapView_Editor.orthographicSize, minOrthoSize, maxOrthoSize);
     }
     public float panSpeed = 0.005f;
     private void HandleMousePan()
@@ -243,12 +224,12 @@ public class EditorView : MonoBehaviour
 
             Vector3 move 
                 = new Vector3(-delta.x, 0, -delta.y) * panSpeed 
-                * GameManager.simulation.sm.cameraType.MapView_Editor.orthographicSize;
+                * GameManager.createScenario.csminfo.cameraType.MapView_Editor.orthographicSize;
             Vector3 newPos 
-                = GameManager.simulation.sm.cameraType.MapView_Editor.transform.position + move;
+                = GameManager.createScenario.csminfo.cameraType.MapView_Editor.transform.position + move;
 
-            float halfHeight = GameManager.simulation.sm.cameraType.MapView_Editor.orthographicSize;
-            float halfWidth = halfHeight * GameManager.simulation.sm.cameraType.MapView_Editor.aspect;
+            float halfHeight = GameManager.createScenario.csminfo.cameraType.MapView_Editor.orthographicSize;
+            float halfWidth = halfHeight * GameManager.createScenario.csminfo.cameraType.MapView_Editor.aspect;
 
             float minX = targetBounds.min.x + halfWidth;
             float maxX = targetBounds.max.x - halfWidth;
@@ -258,83 +239,71 @@ public class EditorView : MonoBehaviour
             newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
             newPos.z = Mathf.Clamp(newPos.z, minZ, maxZ);
 
-            GameManager.simulation.sm.cameraType.MapView_Editor.transform.position = newPos;
+            GameManager.createScenario.csminfo.cameraType.MapView_Editor.transform.position = newPos;
         }
     }
-
-    //Content : Create Object with sphere asset
-    void HandleBoundSpherePlacement(RaycastHit hit, string path, string fileName)
-    {
-        currentBoundSphere.transform.position = new Vector3(hit.point.x, 8f, hit.point.z);
-        if (Input.GetMouseButtonDown(0))
-        {
-            Debug.Log("HandleBoundSphere Place click");
-            currentBoundSphere.transform.position = new Vector3(hit.point.x, 0f, hit.point.z);
-
-            GameManager.simulation.ImportObject(path, fileName, currentBoundSphere.transform,
-                GameManager.simulation.sm.simulationInfo.Simulation_ENV, "agent_import");
-            Destroy(currentBoundSphere);
-        }
-    }
-
 
     //Content3 : Phase3, Phase4
     //Phase 3 : Try select object for init setting
     void TrySelectObject(RaycastHit hit)
     {
-        GameObject MapObject = null;
-        GameObject AgentObject = null;
         Collider[] colliders = Physics.OverlapSphere(hit.point, 40f);
 
-        foreach (Collider col in colliders)
+        List<GameObject> agentObjects = new List<GameObject>();
+        float minDistance = float.MaxValue;
+        GameObject closestAgent = null;
+
+        for (int i = 0; i < colliders.Length; i++)
         {
-            var parents = col.transform.GetComponentsInParent<Transform>();
-            foreach (var p in parents)
+            if (colliders[i] != null && colliders[i].gameObject != null)
             {
-                if (p.tag.Contains("Map")) { MapObject = p.gameObject; break; }
-                if (p.tag.Contains("Agent")) { AgentObject = p.gameObject; break; }
+                var rangeObjectInfo = PrefabInfo.GetImportedObjectInfo(colliders[i].gameObject);
+
+                if (rangeObjectInfo != null)
+                {
+
+                    // Agent 테이블을 가진 오브젝트만 리스트에 추가
+                    if (rangeObjectInfo.table == "Agent")
+                    {
+                        agentObjects.Add(colliders[i].gameObject);
+
+                        // hit 포인트와의 거리 계산
+                        float dist = Vector3.Distance(hit.point, colliders[i].transform.position);
+                        if (dist < minDistance)
+                        {
+                            minDistance = dist;
+                            closestAgent = colliders[i].gameObject;
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.Log($"  - import된 오브젝트가 아님");
+                }
             }
         }
 
-        if (AgentObject != null)
+        // Agent 테이블을 가진 오브젝트가 하나 이상이면 가장 가까운 오브젝트를 currentObeject로 설정
+        if (agentObjects.Count > 0 && closestAgent != null)
         {
-            GameManager.simulation.currentObeject = AgentObject;
+            GameManager.createScenario.currentObeject = closestAgent;
+            SelectAgent = true;
         }
-        else if (MapObject != null)
+        else
         {
-            GameManager.simulation.currentObeject = MapObject;
-        }
-
-        if (GameManager.simulation.currentObeject != null)
-        {
-            if (GameManager.simulation.currentObeject.tag == "Map")
-            {
-                GameManager.simulation.sm.simulationInfo.editorInform.env_profile.Env_Profile.SetActive(true);
-                GameManager.simulation.sm.simulationInfo.editorInform.agent_profile.Agent_Profile.SetActive(false);
-                profile.MapProfileInputFieldApply(GameManager.simulation.currentObeject);
-            }
-            else if (GameManager.simulation.currentObeject.tag.Contains("Agent"))
-            {
-
-                SelectAgent = true;
-                GameManager.simulation.sm.simulationInfo.editorInform.env_profile.Env_Profile.SetActive(false);
-                GameManager.simulation.sm.simulationInfo.editorInform.agent_profile.Agent_Profile.SetActive(true);
-            }
+            Debug.Log("Agent 테이블을 가진 오브젝트가 없거나 currentObeject가 null입니다.");
         }
     }
-
-    
 
     // after init setting, object follow the mouse and if user click the left button on mouse object falling to planes and this function done
     void HandleAgentMovement(RaycastHit hit)
     {
-        GameManager.simulation.currentObeject.transform.position = new Vector3(hit.point.x, 8f, hit.point.z);
-        profile.AgentProfileInputFielApply(GameManager.simulation.currentObeject);
+        GameManager.createScenario.currentObeject.transform.position = new Vector3(hit.point.x, 8f, hit.point.z);
+
 
         if (Input.GetMouseButtonDown(0))
         {
-            GameManager.simulation.currentObeject.transform.position = new Vector3(hit.point.x, 0f, hit.point.z);
-            profile.AgentProfileInputFielApply(GameManager.simulation.currentObeject);
+            GameManager.createScenario.currentObeject.transform.position = new Vector3(hit.point.x, 0f, hit.point.z);
             //GameManager.simulation.currentObeject = null;
             SelectAgent = false;
 

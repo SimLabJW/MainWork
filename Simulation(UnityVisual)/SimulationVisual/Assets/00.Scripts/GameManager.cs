@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,11 +15,14 @@ public class GameManager : MonoBehaviour
     static GameManager instance;
     public static GameManager Instance { get { Init(); return instance; } }
 
-    //SceneSwtichingManager _sceneswitchingManager = new SceneSwtichingManager();
-    //public static SceneSwtichingManager Scene_sw { get { return Instance._sceneswitchingManager; } }
+    CommunicationManager _communicationManager = new CommunicationManager();
+    public static CommunicationManager communication { get { return Instance._communicationManager; } }
 
-    SimulationManager _simulationManager = new SimulationManager();
-    public static SimulationManager simulation { get { return Instance._simulationManager; } }
+    CreateScenarioManager _createScenarioManager = new CreateScenarioManager();
+    public static CreateScenarioManager createScenario { get { return Instance._createScenarioManager; } }
+
+    ScenarioEditManager _scenarioEditManager = new ScenarioEditManager();
+    public static ScenarioEditManager scenarioEdit { get { return Instance._scenarioEditManager; } }
 
     private void Awake()
     {
