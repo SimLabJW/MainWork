@@ -2,6 +2,7 @@
   "name": "CameraModule",
   "references": [
     "CoreScript",
-    "Exporter"
+    "Exporter",
+    "Unity.TextMeshPro"
   ]
 }

@@ -13,12 +13,16 @@ public class RuntimeSizeImporter : MonoBehaviour
     {
         GameManager.createScenario.ImportAgentSizeAction -= CaculateSize;
         GameManager.createScenario.ImportAgentSizeAction += CaculateSize;
+
+        GameManager.scenarioEdit.ImportScenarioAgentSizeAction -= CaculateSize;
+        GameManager.scenarioEdit.ImportScenarioAgentSizeAction += CaculateSize;
     }
 
     // Comfirm Object Size
-    public async void CaculateSize(string fileId, string fileName, Transform Position, Transform Parent, string table)
+    public async void CaculateSize(string fileId, string fileName, string fileDesc, Transform Position, Transform Parent, string table)
     {
         GameManager.createScenario.maxFigure = await StartSize(fileId, fileName, Position, Parent, table);
+        // GameManager.scenarioEdit.maxFigure = await StartSize(fileId, fileName, Position, Parent, table);
     }
     public async Task<float> StartSize(string fileId, string fileName, Transform Position, Transform Parent, string table)
     {

@@ -17,18 +17,18 @@ public class RuntimeImporter : MonoBehaviour
         GameManager.createScenario.ImportEnvAction -= RuntimeImportFunction;
         GameManager.createScenario.ImportEnvAction += RuntimeImportFunction;
 
-        GameManager.createScenario.ImportAgentAction  -= RuntimeImportFunction;
+        GameManager.createScenario.ImportAgentAction -= RuntimeImportFunction;
         GameManager.createScenario.ImportAgentAction += RuntimeImportFunction;
     }
 
-    public async void RuntimeImportFunction(string fileId, string fileName, Transform Position, Transform Parent, string table)
+    public async void RuntimeImportFunction(string fileId, string fileName, string fileDesc, Transform Position, Transform Parent, string table)
     {
         Vector3 importPos = Position.position;
 
-        await ImportModel(fileId, fileName, importPos, Parent, table);
+        await ImportModel(fileId, fileName, fileDesc, importPos, Parent, table);
     }
 
-    public async Task ImportModel(string fileId, string fileName, Vector3 Position, Transform Parent, string table)
+    public async Task ImportModel(string fileId, string fileName, string fileDesc, Vector3 Position, Transform Parent, string table)
     {
         var tcs = new TaskCompletionSource<bool>();
         string urlResult = null;
@@ -84,73 +84,21 @@ public class RuntimeImporter : MonoBehaviour
 
         GameManager.createScenario.currentObeject = glbObject;
 
-        await gltf.InstantiateMainSceneAsync(GameManager.createScenario.currentObeject.transform);
+        await gltf.InstantiateMainSceneAsync(glbObject.transform);
 
         // info 객체를 생성하여 딕셔너리에 저장
-        PrefabInfo.ImportedObjectInfo info = new PrefabInfo.ImportedObjectInfo(fileId, fileName, table);
+        PrefabInfo.ImportedObjectInfo info = new PrefabInfo.ImportedObjectInfo(fileId, fileName, "-",table);
         
 
         if(table == "Terrian")
         {
-            // glbObject의 최상위 오브젝트만 추출
-            Transform topObject = GameManager.createScenario.currentObeject.transform.childCount > 0 ? GameManager.createScenario.currentObeject.transform.GetChild(0) : null;
-
-            if (topObject != null)
-            {
-                // water 오브젝트를 topObject의 위치, 회전, 부모로 생성
-                GameObject water = GameObject.Instantiate(GameManager.Instance.Ocean, topObject.position, topObject.rotation, topObject.parent);
-
-                // water의 이름을 topObject의 이름으로 변경
-                water.name = topObject.name;
-
-                // topObject의 모든 자식들을 water로 이동
-                while (topObject.childCount > 0)
-                {
-                    Transform child = topObject.GetChild(0);
-                    child.SetParent(water.transform, true);
-                }
-
-                GameManager.createScenario.LoadedWaterObject = water;
-
-                // PrefabInfo.ImportedObjectInfo info = new PrefabInfo.ImportedObjectInfo(fileId, fileName, table);
-                // PrefabInfo의 딕셔너리에 저장
-                PrefabInfo.AddImportedObjectInfo(GameManager.createScenario.LoadedWaterObject, info);
-                // topObject 삭제 (glbObject는 삭제하지 않음)
-                GameObject.DestroyImmediate(topObject.gameObject);
-            }
+            WaterObjectSetting(info);
         }
         else if(table == "Agent")
         {
-            // PrefabInfo의 딕셔너리에 저장
-            PrefabInfo.AddImportedObjectInfo(GameManager.createScenario.currentObeject, info);
-
-            GameManager.createScenario.currentObeject.AddComponent<Rigidbody>();
-
-            MeshFilter[] meshFilters = GameManager.createScenario.currentObeject.GetComponentsInChildren<MeshFilter>();
-
-            Matrix4x4 rootMatrix = GameManager.createScenario.currentObeject.transform.worldToLocalMatrix;
-            CombineInstance[] combine = new CombineInstance[meshFilters.Length];
-
-            for (int i = 0; i < meshFilters.Length; i++)
-            {
-                combine[i].mesh = meshFilters[i].sharedMesh;
-                combine[i].transform = rootMatrix * meshFilters[i].transform.localToWorldMatrix;
-            }
-
-            Mesh combinedMesh = new Mesh();
-            combinedMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32; // 큰 mesh 지원
-            combinedMesh.CombineMeshes(combine);
-
-            MeshCollider meshCollider = GameManager.createScenario.currentObeject.AddComponent<MeshCollider>();
-            meshCollider.sharedMesh = combinedMesh;
-            meshCollider.convex = true; // 필요에 따라 true로 변경
-
-            StartCoroutine(FloaterToSeaAgent(GameManager.createScenario.currentObeject));
+            AgentObjectSetting(info);
         }
-        else if(table == "Platform")
-        {
-            // Platform 관련 추가 로직 필요시 작성
-        }
+
     }
 
     IEnumerator FloaterToSeaAgent(GameObject AgentObject)
@@ -163,6 +111,64 @@ public class RuntimeImporter : MonoBehaviour
             GameManager.createScenario.StartFloaterToSeaAgent(GameManager.createScenario.LoadedWaterObject, AgentObject);
         }
         
+    }
+
+
+    public void WaterObjectSetting(PrefabInfo.ImportedObjectInfo info)
+    {
+        // glbObject의 최상위 오브젝트만 추출
+        Transform topObject = GameManager.createScenario.currentObeject.transform.childCount > 0 ? GameManager.createScenario.currentObeject.transform.GetChild(0) : null;
+
+        if (topObject != null)
+        {
+            // water 오브젝트를 topObject의 위치, 회전, 부모로 생성
+            GameObject water = GameObject.Instantiate(GameManager.Instance.Ocean, topObject.position, topObject.rotation, topObject.parent);
+
+            // water의 이름을 topObject의 이름으로 변경
+            water.name = topObject.name;
+
+            // topObject의 모든 자식들을 water로 이동
+            while (topObject.childCount > 0)
+            {
+                Transform child = topObject.GetChild(0);
+                child.SetParent(water.transform, true);
+            }
+
+            GameManager.createScenario.LoadedWaterObject = water;
+
+            PrefabInfo.AddImportedObjectInfo(GameManager.createScenario.LoadedWaterObject, info);
+
+            GameObject.DestroyImmediate(topObject.gameObject);
+        }
+    }
+
+    public void AgentObjectSetting(PrefabInfo.ImportedObjectInfo info)
+    {
+        // PrefabInfo의 딕셔너리에 저장
+        PrefabInfo.AddImportedObjectInfo(GameManager.createScenario.currentObeject, info);
+
+        GameManager.createScenario.currentObeject.AddComponent<Rigidbody>();
+
+        MeshFilter[] meshFilters = GameManager.createScenario.currentObeject.GetComponentsInChildren<MeshFilter>();
+
+        Matrix4x4 rootMatrix = GameManager.createScenario.currentObeject.transform.worldToLocalMatrix;
+        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+
+        for (int i = 0; i < meshFilters.Length; i++)
+        {
+            combine[i].mesh = meshFilters[i].sharedMesh;
+            combine[i].transform = rootMatrix * meshFilters[i].transform.localToWorldMatrix;
+        }
+
+        Mesh combinedMesh = new Mesh();
+        combinedMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32; // 큰 mesh 지원
+        combinedMesh.CombineMeshes(combine);
+
+        MeshCollider meshCollider = GameManager.createScenario.currentObeject.AddComponent<MeshCollider>();
+        meshCollider.sharedMesh = combinedMesh;
+        meshCollider.convex = true; // 필요에 따라 true로 변경
+
+        StartCoroutine(FloaterToSeaAgent(GameManager.createScenario.currentObeject));
     }
 
 

@@ -14,25 +14,33 @@ public class ScenarioEditInform : MonoBehaviour
     {
         [Header("Simulation Env")]
         public Transform Simulation_ENV;
+        public GameObject Agent_Size;
 
         [Header("Scenario Set")]
-        public ScenarioEdit scenarioEdit;
+        public ScenarioSet scenarioSet = new ScenarioSet();
 
         [Header("Environment Set")]
-        public EnvironmentEdit environmentEdit;
+        public EnvironmentEdit environmentEdit= new EnvironmentEdit();
 
         [Header("DeployablePlatform Set")]
-        public GameObject deployablePlatformContent;
+        public GameObject GreenPlatformContent;
+        public GameObject RedPlatformContent;
+        public GameObject WhitePlatformContent;
+        public GameObject deployableButton;
 
         [Header("AllocateObject Set")]
         public GameObject AllocateObjectContent;
+        public GameObject AllocateObjectButton;
 
         [Header("Waypoint Set")]
         public GameObject waypointContent;
+        public GameObject WaypointObjectButton;
+        public GameObject WaypointViewPrefab;
+        public GameObject WaypointConnectPrefab;
     }
 
     [Serializable]
-    public class ScenarioEdit
+    public class ScenarioSet
     {
         [Header("Scenario Info")]
         public Button NewScenario;
@@ -51,15 +59,12 @@ public class ScenarioEditInform : MonoBehaviour
         public GameObject EnvironmentPanel;
         public Button EnvironmentEditButton;
 
-        [Header("Public Environment")]
-        public PublicEnvironment publicEnvironment;
-
-        [Header("Public Environment")]
-        public SeaEnvrionment seaEnvironment;
+        [Header("Environment Value")]
+        public EnvironmentValue environmentvalue = new EnvironmentValue();
     }
 
     [Serializable]
-    public class PublicEnvironment
+    public class EnvironmentValue
     {
         public GameObject WeatherType; // 맑음/비/눈/번개 등 날씨
 
@@ -77,11 +82,7 @@ public class ScenarioEditInform : MonoBehaviour
 
         public Text Visibility_T; // 시야 거리
         public Slider Visibility_S;
-    }
 
-    [Serializable]
-    public class SeaEnvrionment
-    {
         public Text WaveHeight_T; //파도 높이
         public Slider WaveHeight_S;
 
@@ -100,4 +101,18 @@ public class ScenarioEditInform : MonoBehaviour
         public Text SeaLevel_T; // 해수면 높이
         public Slider SeaLevel_S;
     }
+
+    [Header("Camera Type")]
+    [SerializeField]
+    public ScenarioEditCameraType cameraType = new ScenarioEditCameraType();
+
+    [Serializable]
+    public class ScenarioEditCameraType
+    {
+        [Header("Map View")]
+        public GameObject Editor_ScenarioView;
+        [Header("Scenario Camera")]
+        public Camera ScenarioView_Editor;
+    }
+
 }

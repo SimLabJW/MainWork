@@ -6,6 +6,6 @@ using UnityEngine;
 public class SimulationManager
 {
     public CreateScenarioInform csminfo;
-
+    public ScenarioEditInform scinfo;
     
 }

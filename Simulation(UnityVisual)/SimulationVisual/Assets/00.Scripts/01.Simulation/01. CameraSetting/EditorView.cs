@@ -50,10 +50,10 @@ public class EditorView : MonoBehaviour
         FitCameraToTargets(transforms);
     }
     // Phase 2(Agent Button)
-    private void ObjectSizeCalculate(string fileId, string fileName, Transform Position, string table)
+    private void ObjectSizeCalculate(string fileId, string fileName, string fileDesc, Transform Position, string table)
     {
         // maxFigure를 계산한다 & 해당 최대 크기로 된 구체를 생성
-        StartCoroutine(DelayedImporterSize(fileId, fileName, Position, table)); 
+        StartCoroutine(DelayedImporterSize(fileId, fileName, fileDesc, Position, table)); 
 
         // 이동
         //StartCoroutine(EditorMoveandCreate(path, fileName, Position));
@@ -61,7 +61,7 @@ public class EditorView : MonoBehaviour
         {
             StopCoroutine(editorRoutine);
         }
-        editorRoutine = StartCoroutine(EditorMoveandCreate(fileId, fileName, Position, table));
+        editorRoutine = StartCoroutine(EditorMoveandCreate(fileId, fileName, fileDesc, Position, table));
     }
 
     IEnumerator StartImporterSize(string fileId, string fileName, Transform Position)
@@ -74,16 +74,17 @@ public class EditorView : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
     }
-    IEnumerator DelayedImporterSize(string fileId, string fileName, Transform Position, string table)
+    IEnumerator DelayedImporterSize(string fileId, string fileName, string fileDesc, Transform Position, string table)
     {
-        GameManager.createScenario.ImportObject(fileId, fileName, GameManager.createScenario.csminfo.createScenarioInfo.Simulation_ENV,
+        GameManager.createScenario.ImportObject(fileId, fileName, fileDesc, GameManager.createScenario.csminfo.createScenarioInfo.Simulation_ENV,
                     GameManager.createScenario.csminfo.createScenarioInfo.Simulation_ENV, table);
+
         yield return new WaitForSeconds(2f);
 
         StartCoroutine(StartImporterSize(fileId, fileName, Position));
     }
 
-    IEnumerator EditorMoveandCreate(string fileId, string fileName, Transform Position, string table)
+    IEnumerator EditorMoveandCreate(string fileId, string fileName, string fileDesc, Transform Position, string table)
     {
         while (true)
         {
@@ -99,7 +100,7 @@ public class EditorView : MonoBehaviour
                         currentBoundSphere.transform.position = new Vector3(hit.point.x, 0f, hit.point.z);
 
                         GameManager.createScenario.Editor_AGENT = true;
-                        GameManager.createScenario.ImportAgentAction?.Invoke(fileId, fileName, currentBoundSphere.transform,
+                        GameManager.createScenario.ImportAgentAction?.Invoke(fileId, fileName, fileDesc, currentBoundSphere.transform,
                             GameManager.createScenario.csminfo.createScenarioInfo.Simulation_ENV, table);
 
                         Destroy(currentBoundSphere);

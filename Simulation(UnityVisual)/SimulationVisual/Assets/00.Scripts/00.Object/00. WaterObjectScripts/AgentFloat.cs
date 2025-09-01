@@ -6,7 +6,7 @@ public class AgentFloat : MonoBehaviour
 {
     public Rigidbody rb;
     public float depthBefSub = 0.8f;
-    public float displacementAmt = 1f;
+    public float displacementAmt = GameManager.scenarioEdit.BuoyancyStrength;
     public float waterDrag = 1f;
     public float waterAngularDrag = 1f;
     public WaterSurface water;
@@ -16,13 +16,14 @@ public class AgentFloat : MonoBehaviour
 
     private void OnEnable()
     {
-        // ÄÚ·çÆ¾ ½ÃÀÛ
+        
         StartCoroutine(ApplyBuoyancy());
+        //Update displacementAmt
     }
 
     private IEnumerator ApplyBuoyancy()
     {
-        WaitForFixedUpdate wait = new WaitForFixedUpdate(); // ¹°¸® ÇÁ·¹ÀÓ ±âÁØ
+        WaitForFixedUpdate wait = new WaitForFixedUpdate(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
         while (true)
         {
@@ -37,16 +38,19 @@ public class AgentFloat : MonoBehaviour
             Search.startPositionWS = transform.position;
             water.ProjectPointOnWaterSurface(Search, out SearchResult);
 
+            // ë§¤ í”„ë ˆì„ GameManagerì˜ í˜„ì¬ ë¶€ë ¥ ì„¤ì •ê°’ê³¼ ë™ê¸°í™”
+            displacementAmt = GameManager.scenarioEdit.BuoyancyStrength;
+
             if (transform.position.y < SearchResult.projectedPositionWS.y)
             {
                 float displacementMulti = Mathf.Clamp01(
                     (SearchResult.projectedPositionWS.y - transform.position.y) / depthBefSub) * displacementAmt;
 
-                // ºÎ·Â Àû¿ë
+                // ï¿½Î·ï¿½ ï¿½ï¿½ï¿½ï¿½
                 Vector3 buoyancy = Vector3.up * Mathf.Abs(Physics.gravity.y) * displacementMulti;
                 rb.AddForceAtPosition(buoyancy, transform.position, ForceMode.Force);
 
-                // ÀúÇ× Àû¿ë
+                // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 Vector3 damping = -rb.velocity * waterDrag;
                 rb.AddForce(damping * displacementMulti * Time.fixedDeltaTime, ForceMode.VelocityChange);
 

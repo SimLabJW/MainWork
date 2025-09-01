@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using UnityEngine.UI; // Text, Button 등 UI 컴포넌트 사용을 위해 추가
 using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
 
 public class CreateScenario : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class CreateScenario : MonoBehaviour
 
     private CreateScenarioInform.CreateScenarioInfo csminfo;
     private CreateScenarioInform.CreateScenarioCameraType caminfo;
+
+    public GameObject ScenarioEditObject;
 
     void Start()
     {
@@ -55,34 +58,23 @@ public class CreateScenario : MonoBehaviour
                 break;
 
             case "Save":
-                // PrefabInfo의 모든 import된 오브젝트 정보를 로그로 출력
-                // PrefabInfo.LogAllImportedObjects();
-                
+
                 string ScenarioName = GameManager.createScenario.SaveScenarioName;
                 string ScenarioDescription = GameManager.createScenario.SaveScenarioDescription;
-               
-                // List<string>을 string[] 배열로 변환
+
                 string[] terrianFileIds = PrefabInfo.GetFileIdsByTable("Terrian").ToArray();
                 string[] agentFileIds = PrefabInfo.GetFileIdsByTable("Agent").ToArray();
 
-                // // 시나리오 정보에 오브젝트 데이터 추가
-                // Debug.Log($"=== 시나리오 저장 정보 ===");
-                // Debug.Log($"시나리오명: {ScenarioName}");
-                // Debug.Log($"시나리오 설명: {ScenarioDescription}");
-
-                // if (terrianFileIds.Length > 0)
-                // {
-                //     // 배열 자체를 바로 출력 (ToString()은 타입명만 나오므로, string.Join 사용 없이 배열 전체를 출력)
-                //     Debug.Log($"환경 파일 ID 목록: {Newtonsoft.Json.JsonConvert.SerializeObject(terrianFileIds)}");
-                // }
-
-                // if (agentFileIds.Length > 0)
-                // {
-                //     Debug.Log($"에이전트 파일 ID 목록: {Newtonsoft.Json.JsonConvert.SerializeObject(agentFileIds)}");
-                // }
-
                 StartCoroutine(WaitForCommResultSaveCoroutine(ScenarioName, ScenarioDescription, terrianFileIds, agentFileIds));
+                caminfo.MapView_Editor.gameObject.SetActive(false);
+
+                gameObject.SetActive(false);
+                ScenarioEditObject.SetActive(true);
+
                 
+                caminfo.MapView_Editor.gameObject.SetActive(true);
+                // caminfo.MapView_Editor.gameObject.SetActive(false);
+
                 break;
         }
     }
@@ -113,6 +105,7 @@ public class CreateScenario : MonoBehaviour
 
             string fileName = file["name"]?.ToString();
             string fileId = file["id"]?.ToString();
+            string fileDesc = file["desc"]?.ToString();
 
             Text buttonText = newButton.GetComponentInChildren<Text>();
             if (buttonText != null)
@@ -121,18 +114,18 @@ public class CreateScenario : MonoBehaviour
             }
             newButton.onClick.RemoveAllListeners();
 
-            newButton.onClick.AddListener(() => ClickedForInstantiate(table, fileId, fileName));
+            newButton.onClick.AddListener(() => ClickedForInstantiate(table, fileId, fileName, fileDesc));
         }
     }
 
-    void ClickedForInstantiate(string table, string fileId, string fileName)
+    void ClickedForInstantiate(string table, string fileId, string fileName, string fileDesc)
     {
       
         switch (table)
         {
             case "Terrian":
                 csminfo.Env_rawimage.color = Color.green;
-                GameManager.createScenario.ImportObject(fileId, fileName,
+                GameManager.createScenario.ImportObject(fileId, fileName, fileDesc,
                     csminfo.Simulation_ENV, csminfo.Simulation_ENV, table);
                 caminfo.MapView_Editor.gameObject.SetActive(true);
 
@@ -147,7 +140,7 @@ public class CreateScenario : MonoBehaviour
                 if (GameManager.createScenario.Editor_ENV)
                 {
                     csminfo.Agent_rawimage.color = Color.green;
-                    GameManager.createScenario.EditorViewControl(fileId, fileName,
+                    GameManager.createScenario.EditorViewControl(fileId, fileName, fileDesc,
                     csminfo.Simulation_ENV, table);
                 }
                 break;
@@ -173,6 +166,8 @@ public class CreateScenario : MonoBehaviour
 
     IEnumerator WaitForCommResultSaveCoroutine(string scenarioName, string scenarioDescription, string[] terrianList, string[] agentList)
     {
+        
+
         GameManager.createScenario.SaveScenario(scenarioName, scenarioDescription, terrianList, agentList);
         
         yield return new WaitForSeconds(1.5f);

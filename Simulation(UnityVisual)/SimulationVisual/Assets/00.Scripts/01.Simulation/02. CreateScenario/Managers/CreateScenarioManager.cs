@@ -16,17 +16,17 @@ public class CreateScenarioManager
     public bool SaveObejct = false;
     
     // Load Object Event(by RuntimeImporter, env)
-    public Action<string, string, Transform, Transform, string> ImportEnvAction;
+    public Action<string, string, string, Transform, Transform, string> ImportEnvAction;
 
     // Editor View Control Action(by EditorView)
     public Action<GameObject> EditorViewFitAction;
     // Phase 1 Object Event(EditorView, agent)
-    public Action<string, string, Transform, string> EditorViewControlAction;
+    public Action<string, string, string, Transform, string> EditorViewControlAction;
     // Phase 2 Object Size(by RuntimeImporter, agent_size)
-    public Action<string, string, Transform, Transform, string> ImportAgentSizeAction;
+    public Action<string, string, string, Transform, Transform, string> ImportAgentSizeAction;
     public float maxFigure = 0f;
     // Phase 3 Load Object(by RuntimeImporter, agent)
-    public Action<string, string, Transform, Transform, string> ImportAgentAction;
+    public Action<string, string, string, Transform, Transform, string> ImportAgentAction;
 
     // Agent Function Action
     public Action<GameObject, GameObject> SeaAgentAction;
@@ -39,15 +39,15 @@ public class CreateScenarioManager
     public bool Editor_ENV = false;
     public bool Editor_AGENT = false;
     // RuntimeImporter에서 RuntimeImportFunction 호출
-    public void ImportObject(string fileId, string fileName, Transform Position, Transform Parent ,string table)
+    public void ImportObject(string fileId, string fileName, string fileDesc, Transform Position, Transform Parent ,string table)
     {
         switch(table)
         {
             case "Terrian":
-                ImportEnvAction?.Invoke(fileId, fileName, Position, Parent, table);
+                ImportEnvAction?.Invoke(fileId, fileName, fileDesc, Position, Parent, table);
                 break;
             case "Agent":
-                ImportAgentSizeAction?.Invoke(fileId, fileName, Position, Parent, table);
+                ImportAgentSizeAction?.Invoke(fileId, fileName, fileDesc, Position, Parent, table);
                 break;
         }
     }
@@ -58,10 +58,10 @@ public class CreateScenarioManager
         // 화면 맞추기
         EditorViewFitAction?.Invoke(SimulationEnvObject);
     }
-    public void EditorViewControl(string fileId, string fileName, Transform Position, string table)
+    public void EditorViewControl(string fileId, string fileName, string fileDesc, Transform Position, string table)
     {
         // Agent 크기 및 위치 
-        EditorViewControlAction?.Invoke(fileId, fileName, Position, table);
+        EditorViewControlAction?.Invoke(fileId, fileName, fileDesc, Position, table);
     }
 
     // RuntimeImporter.cs 통해 Sea_Agent 생성시 Floater 위치 지정
