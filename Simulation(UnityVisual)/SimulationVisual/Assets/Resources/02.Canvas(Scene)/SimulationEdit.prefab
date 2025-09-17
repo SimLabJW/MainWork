@@ -194,9 +194,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8731520723435362830}
-  - component: {fileID: 896568840956850054}
-  - component: {fileID: 5504824032990031906}
-  - component: {fileID: 5410156528550718665}
   m_Layer: 0
   m_Name: SimulationEdit
   m_TagString: Untagged
@@ -221,95 +218,6 @@ Transform:
   - {fileID: 2145330607963246569}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &896568840956850054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2189306127790364716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e056e50193baa96499be5fa0649a5370, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scenarioEditInform: {fileID: 5504824032990031906}
-  FileListUI: {fileID: 0}
-  NewScenarioCreate: {fileID: 0}
---- !u!114 &5504824032990031906
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2189306127790364716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86736a2a27af2c143837f58be238e9a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scenarioEditInfo:
-    Simulation_ENV: {fileID: 0}
-    Agent_Size: {fileID: 0}
-    scenarioSet:
-      NewScenario: {fileID: 0}
-      OpenScenario: {fileID: 0}
-      SaveScenario: {fileID: 0}
-      DeleteScenario: {fileID: 0}
-      ScenarioName: {fileID: 0}
-      ScenarioDescription: {fileID: 0}
-    environmentEdit:
-      EnvironmentPanel: {fileID: 0}
-      EnvironmentEditButton: {fileID: 0}
-      environmentvalue:
-        WeatherType: {fileID: 0}
-        LightingIntensity_T: {fileID: 0}
-        LightingIntensity_S: {fileID: 0}
-        SunAngle_T: {fileID: 0}
-        SunAngle_S: {fileID: 0}
-        Temperature_T: {fileID: 0}
-        Temperature_S: {fileID: 0}
-        RainIntensity_T: {fileID: 0}
-        RainIntensity_S: {fileID: 0}
-        Visibility_T: {fileID: 0}
-        Visibility_S: {fileID: 0}
-        WaveHeight_T: {fileID: 0}
-        WaveHeight_S: {fileID: 0}
-        WaveSpeed_T: {fileID: 0}
-        WaveSpeed_S: {fileID: 0}
-        WaveDirectionNS: {fileID: 0}
-        WaveDirectionWE: {fileID: 0}
-        WaveClarity_T: {fileID: 0}
-        WaveClarity_S: {fileID: 0}
-        BuoyancyStrength_T: {fileID: 0}
-        BuoyancyStrength_S: {fileID: 0}
-        SeaLevel_T: {fileID: 0}
-        SeaLevel_S: {fileID: 0}
-    deployablePlatformContent: {fileID: 0}
-    deployableButton: {fileID: 969485688553724759, guid: c90ddaeda78d7e84abb1f0e98d88422a,
-      type: 3}
-    AllocateObjectContent: {fileID: 0}
-    AllocateObjectButton: {fileID: 4375340650317714903, guid: 5b76912d3df1d76499e7222d6dad16f0,
-      type: 3}
-    waypointContent: {fileID: 0}
-    WaypointObjectButton: {fileID: 0}
-    WaypointViewPrefab: {fileID: 0}
-    WaypointConnectPrefab: {fileID: 0}
-  cameraType:
-    Editor_ScenarioView: {fileID: 0}
-    ScenarioView_Editor: {fileID: 0}
---- !u!114 &5410156528550718665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2189306127790364716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9650d396bb3939478268b32500a68e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2553225975830549082
 GameObject:
   m_ObjectHideFlags: 0

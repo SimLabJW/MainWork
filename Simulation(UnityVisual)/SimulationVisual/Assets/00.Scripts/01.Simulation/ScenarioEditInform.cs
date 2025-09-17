@@ -31,12 +31,18 @@ public class ScenarioEditInform : MonoBehaviour
         [Header("AllocateObject Set")]
         public GameObject AllocateObjectContent;
         public GameObject AllocateObjectButton;
+        public Button AllocateAllObjectButton;
+        public Button AllocateGreenObjectButton;
+        public Button AllocateRedObjectButton;
+        public Button AllocateWhiteObjectButton;
 
         [Header("Waypoint Set")]
         public GameObject waypointContent;
         public GameObject WaypointObjectButton;
         public GameObject WaypointViewPrefab;
         public GameObject WaypointConnectPrefab;
+        public Image SelectAgentPlatformImage;
+        public Text SelectAgentNameText;
     }
 
     [Serializable]

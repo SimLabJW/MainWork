@@ -336,6 +336,33 @@ public class ScenarioView : MonoBehaviour
         if (agentObjects.Count > 0 && closestAgent != null)
         {
             GameManager.createScenario.currentObeject = closestAgent;
+            PrefabInfo.ToggleWaypointsExclusiveForObject(GameManager.createScenario.currentObeject);
+
+            // 상태 색상 반영
+            var unityInfo = PrefabInfo.GetImportedObjectUnityInfo(GameManager.createScenario.currentObeject);
+            var uiImage = GameManager.scenarioEdit.scinfo.scenarioEditInfo.SelectAgentPlatformImage;
+            if (uiImage != null)
+            {
+                Color stateColor = Color.white;
+                if (unityInfo != null)
+                {
+                    if (unityInfo.state == "Green") stateColor = Color.green;
+                    else if (unityInfo.state == "Red") stateColor = Color.red;
+                    else stateColor = Color.white;
+                }
+                uiImage.color = stateColor;
+            }
+
+            // 파일명으로 텍스트 반영
+            var importedInfo = PrefabInfo.GetImportedObjectInfo(GameManager.createScenario.currentObeject);
+            var nameTextComp = GameManager.scenarioEdit.scinfo.scenarioEditInfo.SelectAgentNameText;
+            if (nameTextComp != null)
+            {
+                nameTextComp.text = importedInfo != null && !string.IsNullOrEmpty(importedInfo.fileName)
+                    ? importedInfo.fileName
+                    : GameManager.createScenario.currentObeject.name;
+            }
+
             SelectAgent = true;
         }
         else
@@ -434,6 +461,7 @@ public class ScenarioView : MonoBehaviour
         // 웨이포인트 구체 제거
         if (waypointBoundSphere != null)
         {
+            GameManager.scenarioEdit.waypoints  = new List<GameObject>();
             Destroy(waypointBoundSphere);
             waypointBoundSphere = null;
         }

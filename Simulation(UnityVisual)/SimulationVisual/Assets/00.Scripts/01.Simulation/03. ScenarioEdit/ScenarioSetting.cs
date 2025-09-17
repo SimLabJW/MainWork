@@ -272,9 +272,12 @@ public class ScenarioSetting : MonoBehaviour
                         else if (currentState == "Red") img.color = Color.red;
                     }
 
-                    // 글로벌 상태도 동기화 (필요 시 제거 가능)
-                    // GameManager.scenarioEdit.AgentState = currentState;
-                    // // unity_info 동기화 필요 PrefabInfo 수정 말하는거임임
+                    // unity_info 동기화: FileList의 unity_id 기준으로 상태 반영
+                    string unityIdLocal = FileList.ContainsKey("unity_id") ? FileList["unity_id"]?.ToString() : string.Empty;
+                    if (!string.IsNullOrEmpty(unityIdLocal))
+                    {
+                        PrefabInfo.UpdateImportedObjectUnityStateByUnityId(unityIdLocal, currentState);
+                    }
                 });
             }
             

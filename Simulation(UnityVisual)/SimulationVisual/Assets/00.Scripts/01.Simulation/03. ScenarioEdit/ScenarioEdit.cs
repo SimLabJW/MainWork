@@ -16,6 +16,8 @@ public class ScenarioEdit : MonoBehaviour
 
     public GameObject NewScenarioCreate;
 
+    public Button StartSimulation;
+    public GameObject StartSimulationUI;
     // 환경 설정 초기값을 저장할 딕셔너리
     private Dictionary<string, string> initialEnvironmentValues = new Dictionary<string, string>();
     private Dictionary<string, float> initialSliderValues = new Dictionary<string, float>();
@@ -62,6 +64,13 @@ public class ScenarioEdit : MonoBehaviour
                 }
             }
         );
+
+        // 시작 시 비활성화 (ScenarioObject 없으므로)
+        if (StartSimulation != null)
+        {
+            StartSimulation.interactable = false;
+            StartSimulation.onClick.AddListener(OnClickStartSimulation);
+        }
     }
 
     
@@ -78,6 +87,7 @@ public class ScenarioEdit : MonoBehaviour
 
             case "Open Scenario":
                 FileListUI.SetActive(true);
+                StartSimulation.interactable = true;
                 StartCoroutine(DelayedScenarioButton());
                 break;
 
@@ -156,6 +166,24 @@ public class ScenarioEdit : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    void OnClickStartSimulation()
+    {
+        if (GameManager.scenarioEdit.ScenarioObject == null) return;
+
+        // 요구사항: gameObject false, NewScenarioCreate false, SimulationEdit true
+        // 현재 클래스의 gameObject 비활성화
+        gameObject.SetActive(false);
+
+        // NewScenarioCreate 비활성화
+        if (NewScenarioCreate != null)
+            NewScenarioCreate.SetActive(false);
+
+        
+        StartSimulationUI.SetActive(true);
+        
+
     }
 
     IEnumerator DelayedScenarioButton()

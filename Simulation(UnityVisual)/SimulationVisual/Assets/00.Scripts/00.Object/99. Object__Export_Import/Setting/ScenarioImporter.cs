@@ -247,6 +247,9 @@ public class ScenarioImporter : MonoBehaviour
         meshCollider.sharedMesh = combinedMesh;
         meshCollider.convex = true; // 필요에 따라 true로 변경
 
+        // 에이전트 정면 방향의 가장 높은 위치에 카메라 설치/업데이트
+        CreateOrUpdateAgentTopFrontCamera(AgentObject);
+
         yield return new WaitForSeconds(0.1f);
 
         StartCoroutine(FloaterToSeaAgent(AgentObject));
@@ -262,6 +265,48 @@ public class ScenarioImporter : MonoBehaviour
             GameManager.createScenario.StartFloaterToSeaAgent(GameManager.scenarioEdit.LoadedWaterObject, AgentObject);
         }
         
+    }
+
+    // 에이전트의 메시 바운드를 기준으로 정면(Forward) 방향의 가장 높은 지점에 카메라 배치
+    void CreateOrUpdateAgentTopFrontCamera(GameObject agent)
+    {
+        if (agent == null) return;
+
+        // 이미 존재하면 재배치만 수행
+        Transform existing = agent.transform.Find("AgentTopFrontCamera");
+
+        // 모든 Renderer 바운드를 합쳐 전체 바운드 계산
+        Renderer[] renderers = agent.GetComponentsInChildren<Renderer>();
+        if (renderers == null || renderers.Length == 0) return;
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        Vector3 center = bounds.center;
+        // 오브젝트 중심에서 가장 높은 점(Y max)에 위치
+        Vector3 cameraPos = new Vector3(center.x, bounds.max.y, center.z);
+
+        if (existing == null)
+        {
+            GameObject camObj = new GameObject("AgentTopFrontCamera");
+            camObj.transform.SetParent(agent.transform, worldPositionStays: true);
+            camObj.transform.position = cameraPos;
+            camObj.transform.rotation = Quaternion.LookRotation(agent.transform.forward, Vector3.up);
+
+            var cam = camObj.AddComponent<Camera>();
+            cam.clearFlags = CameraClearFlags.Skybox;
+            cam.nearClipPlane = 0.1f;
+            cam.farClipPlane = 10000f;
+            cam.fieldOfView = 60f;
+        }
+        else
+        {
+            existing.position = cameraPos;
+            existing.rotation = Quaternion.LookRotation(agent.transform.forward, Vector3.up);
+        }
     }
 
 }

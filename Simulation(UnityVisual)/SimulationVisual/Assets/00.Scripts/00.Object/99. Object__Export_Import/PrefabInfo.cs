@@ -98,6 +98,18 @@ public class PrefabInfo
     {
         importedObjectUnityInfos[obj] = unity_info;
     }
+
+    // unityId로 오브젝트를 찾아 unity_info의 state를 업데이트
+    public static bool UpdateImportedObjectUnityStateByUnityId(string unityId, string newState)
+    {
+        if (string.IsNullOrEmpty(unityId)) return false;
+        var targetPair = importedObjectUnityInfos.FirstOrDefault(kvp => kvp.Value != null && kvp.Value.unityId == unityId);
+        if (targetPair.Key == null) return false;
+        targetPair.Value.state = newState;
+        importedObjectUnityInfos[targetPair.Key] = targetPair.Value;
+        return true;
+    }
+    
     public static void AddImportedObjectWayPointsInfo(GameObject obj, WaypointInfo waypoint_info)
     {
         if (!waypointsList.ContainsKey(obj))
@@ -296,6 +308,29 @@ public class PrefabInfo
             return waypointList.FirstOrDefault(w => w.index == index);
         }
         return null;
+    }
+
+    // 전달된 오브젝트의 웨이포인트만 활성화하고, 다른 오브젝트의 웨이포인트는 비활성화
+    public static void ToggleWaypointsExclusiveForObject(GameObject targetObject)
+    {
+        foreach (var pair in waypointsList)
+        {
+            bool isTarget = pair.Key == targetObject;
+            var list = pair.Value;
+            if (list == null) continue;
+            foreach (var waypoint in list)
+            {
+                if (waypoint == null) continue;
+                if (waypoint.pointObject != null)
+                {
+                    waypoint.pointObject.SetActive(isTarget);
+                }
+                if (waypoint.pointButtonObject != null)
+                {
+                    waypoint.pointButtonObject.SetActive(isTarget);
+                }
+            }
+        }
     }
 
 
