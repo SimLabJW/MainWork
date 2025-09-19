@@ -34,8 +34,7 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 ## 3. Virtual Environment / Create Map
 
 ### Setting
-<img src="./png/Set.png" alt="Set" width="300" height="300"/>
-<img src="./png/Porcess.png" alt="Porcess" width="300" height="300"/>
+<img src="./png/Set.png" alt="Set" width="300" height="300"/>, <img src="./png/Porcess.png" alt="Porcess" width="300" height="300"/>
 
 
 ### Result
