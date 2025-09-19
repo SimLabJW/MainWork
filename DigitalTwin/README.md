@@ -19,9 +19,13 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 
 손의 모양, 블럭의 위치 등에 따른 자동차 동작
 
-<img src="./png/Cube_RemoteControl1.png" alt="Cube_RemoteControl1" width="250" height="250"/>
-<img src="./png/Cube_RemoteControl2.png" alt="Cube_RemoteControl2" width="250" height="250"/>
-<img src="./png/Cube_RemoteControl3.png" alt="Cube_RemoteControl3" width="250" height="250"/>
+<p align="center">
+  <img src="./png/Cube_RemoteControl1.png" alt="Cube_RemoteControl1" width="250" height="250"/>
+  <img src="./png/Cube_RemoteControl2.png" alt="Cube_RemoteControl2" width="250" height="250"/>
+  <img src="./png/Cube_RemoteControl3.png" alt="Cube_RemoteControl3" width="250" height="250"/>
+</p>
+
+<!-- 위와 같이 <p align="center">로 감싸면 사진이 가로로 나란히 정렬됩니다. 마크다운에서는 이미지를 연속으로 나열하면 자동으로 가로로 배치되지만, 일부 뷰어에서는 세로로 보일 수 있습니다. 위 방법을 사용해보세요. -->
 
 ---
 
