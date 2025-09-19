@@ -55,6 +55,20 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+# Python Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+lidar/
+
+# Conda Environment
+.conda/
+*.conda
+*.conda_env
+
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
@@ -103,8 +117,12 @@ InitTestScene*.unity*
 # SimulationVisual 폴더 전체를 무시하지 않고, 00.Scripts 폴더만 추적하도록 설정
 # 1. SimulationVisual 하위 모든 파일/폴더 무시
 Simulation(UnityVisual)/SimulationVisual/*
+Reinforcement/MainWork/*
 
 # 2. 단, 00.Scripts 폴더와 그 하위는 추적
 !Simulation(UnityVisual)/SimulationVisual/Assets/
 !Simulation(UnityVisual)/SimulationVisual/Assets/00.Scripts/
 !Simulation(UnityVisual)/SimulationVisual/Assets/00.Scripts/**
+!Reinforcement/MainWork/Assets/
+!Reinforcement/MainWork/Assets/00.Scripts/
+!Reinforcement/MainWork/Assets/00.Scripts/**
