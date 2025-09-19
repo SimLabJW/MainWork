@@ -12,7 +12,7 @@ Mirobot
 ![VR_RemoteControl](./png/VR_RemoteControl.png)
 
 TurtleBot
-![VR_RemoteControl](./png/turtlebot.png)
+![VR_RemoteControl](./png/turtlebot.gif)
 
 ## 5. New
 ### Raspberry Pi 4 Remote Control from Windows
