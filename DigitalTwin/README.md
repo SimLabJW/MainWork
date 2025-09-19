@@ -34,12 +34,12 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 ## 3. Virtual Environment / Create Map
 
 <p align="center">
-  <img src="./png/Set.png" alt="Set" width="250" height="250"/>
-  <img src="./png/Porcess.png" alt="Porcess" width="250" height="250"/>
+  <img src="./png/Set.png" alt="Set" width="300" height="300"/>
+  <img src="./png/Porcess.png" alt="Porcess" width="300" height="300"/>
 </p>
 
 ### Result
-<img src="./png/Result.png" alt="Result" width="400" height="250"/>
+<img src="./png/Result.png" alt="Result" width="400" height="150"/>
 
 ## 5. New
 ### Raspberry Pi 4 Remote Control from Windows
