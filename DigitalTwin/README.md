@@ -35,7 +35,7 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 
 <p align="center">
   <img src="./png/Set.png" alt="Set" width="250" height="250"/>
-  <img src="./png/Process.png" alt="Process" width="250" height="250"/>
+  <img src="./png/Porcess.png" alt="Porcess" width="250" height="250"/>
 </p>
 
 ### Result
