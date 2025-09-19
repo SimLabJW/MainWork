@@ -25,7 +25,7 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 <p align="center">
   <img src="./png/Cube_RemoteControl1.png" alt="Cube_RemoteControl1" width="250" height="250"/>
   <img src="./png/Cube_RemoteControl2.png" alt="Cube_RemoteControl2" width="250" height="250"/>
-  <img src="./png/Cube_RemoteControl3.png" alt="Cube_RemoteControl3" width="250" height="190"/>
+  <img src="./png/Cube_RemoteControl3.png" alt="Cube_RemoteControl3" width="250" height="195"/>
 </p>
 
 
@@ -34,7 +34,7 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 ## 3. Virtual Environment / Create Map
 
 ### Setting
-<img src="./png/Set.png" alt="Set" width="300" height="300"/>, <img src="./png/Porcess.png" alt="Porcess" width="300" height="300"/>
+<img src="./png/Set.png" alt="Set" width="400" height="300"/>, <img src="./png/Porcess.png" alt="Porcess" width="400" height="300"/>
 
 
 ### Result
