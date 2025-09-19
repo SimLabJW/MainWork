@@ -8,9 +8,20 @@
 ## 1. Remote Control / Unity VR
 Device : Mirobot, Turtlebot, Robomaster(추후)
 
-Mirobot, Turtlebot
+**Mirobot, Turtlebot**
+
 ![VR_RemoteControl](./png/VR_RemoteControl.png)
 ![VR_RemoteControl](./png/turtlebot.gif)
+
+---
+
+## 2. Remote Control / Hand Control
+
+손의 모양, 블럭의 위치 등에 따른 자동차 동작
+
+![Cube_RemoteControl](./png/Cube_RemoteControl1.png)
+![Cube_RemoteControl](./png/Cube_RemoteControl2.png)
+![Cube_RemoteControl](./png/Cube_RemoteControl3.png)
 
 ---
 
