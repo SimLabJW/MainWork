@@ -10,10 +10,11 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 
 **Mirobot, Turtlebot**
 
-<!-- ![VR_RemoteControl](./png/VR_RemoteControl.png) -->
-<img src="./png/VR_RemoteControl.png" alt="VR_RemoteControl" width="500" height="250"/>
+<img src="./png/VR_RemoteControl.png" alt="VR_RemoteControl" width="800" height="400"/>
 
-![VR_RemoteControl](./png/turtlebot.gif)
+<img src="./png/turtlebot.gif" alt="VR_RemoteControl_gif" width="400" height="350"/>
+
+
 
 ---
 
@@ -27,7 +28,6 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
   <img src="./png/Cube_RemoteControl3.png" alt="Cube_RemoteControl3" width="250" height="200"/>
 </p>
 
-<!-- 위와 같이 <p align="center">로 감싸면 사진이 가로로 나란히 정렬됩니다. 마크다운에서는 이미지를 연속으로 나열하면 자동으로 가로로 배치되지만, 일부 뷰어에서는 세로로 보일 수 있습니다. 위 방법을 사용해보세요. -->
 
 ---
 
