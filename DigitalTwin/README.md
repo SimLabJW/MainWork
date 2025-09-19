@@ -19,9 +19,9 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 
 손의 모양, 블럭의 위치 등에 따른 자동차 동작
 
-<img src="./png/Cube_RemoteControl1.png" alt="Cube_RemoteControl1" width="400"/>
-<img src="./png/Cube_RemoteControl2.png" alt="Cube_RemoteControl2" width="400"/>
-<img src="./png/Cube_RemoteControl3.png" alt="Cube_RemoteControl3" width="400"/>
+<img src="./png/Cube_RemoteControl1.png" alt="Cube_RemoteControl1" width="250" height="250"/>
+<img src="./png/Cube_RemoteControl2.png" alt="Cube_RemoteControl2" width="250" height="250"/>
+<img src="./png/Cube_RemoteControl3.png" alt="Cube_RemoteControl3" width="250" height="250"/>
 
 ---
 
