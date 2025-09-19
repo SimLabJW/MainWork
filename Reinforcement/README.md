@@ -10,10 +10,10 @@
 ## 2. RL(Unity, Python)
 
 ### Unity Environment
-**Setting**
+#### **Setting**
 <img src="./png/set.png" alt="RL" width="600" height="300"/>
 
-**Process**
+#### **Process**
 <img src="./png/process.png" alt="RL" width="600" height="300"/>
 
 ### Result
