@@ -8,11 +8,11 @@
 ## 1. Remote Control / Unity VR
 Device : Mirobot, Turtlebot, Robomaster(추후)
 
-Mirobot
+Mirobot, Turtlebot
 ![VR_RemoteControl](./png/VR_RemoteControl.png)
-
-TurtleBot
 ![VR_RemoteControl](./png/turtlebot.gif)
+
+---
 
 ## 5. New
 ### Raspberry Pi 4 Remote Control from Windows
