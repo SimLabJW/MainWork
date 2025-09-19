@@ -1,9 +1,9 @@
 # DigitalTwin
-1. Remote Control : Unity VR
-2. Remote Control : Hand Pose
-3. Virtual Envrionment : Robomaster, SLAM
-4. Virtual Remote Control
-5. New
+**1. Remote Control : Unity VR**  
+**2. Remote Control : Hand Pose**  
+**3. Virtual Envrionment : Robomaster, SLAM**  
+**4. Virtual Remote Control**  
+**5. New**
 
 ## 1. Remote Control / Unity VR
 Device : Mirobot, Turtlebot, Robomaster(추후)
