@@ -10,7 +10,9 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 
 **Mirobot, Turtlebot**
 
-![VR_RemoteControl](./png/VR_RemoteControl.png)
+<!-- ![VR_RemoteControl](./png/VR_RemoteControl.png) -->
+<img src="./png/VR_RemoteControl.png" alt="VR_RemoteControl" width="500" height="250"/>
+
 ![VR_RemoteControl](./png/turtlebot.gif)
 
 ---
