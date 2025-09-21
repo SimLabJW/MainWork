@@ -54,9 +54,13 @@ def main():
         occ_map = update_occupancy(occ_map, robot_pos, scans, robot_angle)
 
         # === 시각화 ===
-        # Ground truth 맵
-        surf = pygame.surfarray.make_surface(255 - map_array * 255)
-        screen.blit(surf, (0, 0))
+        slam_vis = np.zeros((*occ_map.shape, 3), dtype=np.uint8)
+        slam_vis[occ_map == 0] = [50, 50, 50]     # 미탐사: 어두운 회색
+        slam_vis[occ_map == 1] = [200, 200, 200]  # 빈공간: 밝은 회색
+        slam_vis[occ_map == 2] = [0, 0, 0]        # 벽: 검정
+
+        slam_surf = pygame.surfarray.make_surface(np.transpose(slam_vis, (1, 0, 2)))
+        screen.blit(slam_surf, (0, 0))
 
         # SLAM 맵
         slam_vis = np.zeros((*occ_map.shape, 3), dtype=np.uint8)
