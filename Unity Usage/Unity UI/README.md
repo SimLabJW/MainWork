@@ -11,5 +11,5 @@
 shape는 Box 형태가 가장 사용하기 편함.
 
 setting
-<img src="./png/light(Global Volume).png" alt="LightSetting" width="300" height="250"/>
+<img src="./png/light(GlobalVolume).png" alt="LightSetting" width="300" height="250"/>
 ---
