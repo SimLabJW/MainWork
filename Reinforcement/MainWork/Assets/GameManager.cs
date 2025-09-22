@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour
     SLAMCommManager slam_commmanager = new SLAMCommManager();
     public static SLAMCommManager s_comm { get { return Instance.slam_commmanager; } }
 
+    SLAMAgentManager slam_agent = new SLAMAgentManager();
+    public static SLAMAgentManager s_agent { get { return Instance.slam_agent; } }
+
     private void Awake() 
     {
         Init();

@@ -1,18 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-public class SLAMAgentManager : MonoBehaviour
+public class SLAMAgentManager 
 {
-    // Start is called before the first frame update
-    void Start()
+    public Coroutine scanCoroutine;
+
+    public Action StartLidar;
+    public void LidarStartEvent()
     {
-        
+        StartLidar?.Invoke();
     }
 
-    // Update is called once per frame
-    void Update()
+    public Action StopLidar;
+    public void LidarStopEvent()
     {
-        
+        StopLidar?.Invoke();
     }
 }
