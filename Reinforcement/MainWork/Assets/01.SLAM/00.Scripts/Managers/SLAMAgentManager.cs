@@ -16,4 +16,8 @@ public class SLAMAgentManager
     {
         StopLidar?.Invoke();
     }
+
+    public float deltaX_m;       // Δx (m)
+    public float deltaY_m;       // Δy (m)
+    public float deltaTheta_rad; // Δθ (rad)
 }

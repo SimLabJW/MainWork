@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Text;
 
-public class Artificial_RPLIDAR : MonoBehaviour
+public class Artificial_RPLIDAR_Laser : MonoBehaviour
 {
     [Header("LIDAR Settings")]
-    public float scanFrequencyHz = 5.5f;
+    public float scanFrequencyHz = 8f;
     public int pointsPerScan = 1450;
-    public float maxDistance = 80f;
+    public float maxDistance = 20f;
     public float minDistance = 0.15f;
 
     [Header("Scan Origin")]
@@ -139,11 +139,16 @@ public class Artificial_RPLIDAR : MonoBehaviour
             sb.AppendFormat("{0:F4},{1:F1},{2:F0}\n", angleRad, distance_mm, intensity);
 
         }
+
+        sb.AppendFormat("POSE,{0:F4},{1:F4},{2:F4}\n",
+            GameManager.s_agent.deltaX_m,
+            GameManager.s_agent.deltaY_m,
+            GameManager.s_agent.deltaTheta_rad);
         // 한 프레임(360도) 데이터로 lidarData 생성 후 1회 전송
-        string lidarData = sb.ToString();
+        string SLAM_Data = sb.ToString();
         if (GameManager.s_comm.s_comm_Coroutine == null )
         {
-            GameManager.s_comm.s_comm_Coroutine = StartCoroutine(GameManager.s_comm.RequestLoop(lidarData));
+            GameManager.s_comm.s_comm_Coroutine = StartCoroutine(GameManager.s_comm.RequestLoop(SLAM_Data));
         }
     }
 }

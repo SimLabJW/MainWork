@@ -34,4 +34,9 @@ public class GameManager : MonoBehaviour
             instance = go.GetComponent<GameManager>();
         }
     }
+
+    private void OnApplicationQuit()
+    {
+        s_comm.ShutdownSafely();
+    }
 }
