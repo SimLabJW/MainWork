@@ -17,7 +17,7 @@ public class SLAMAgentManager
         StopLidar?.Invoke();
     }
 
-    public float deltaX_m;       // Δx (m)
-    public float deltaY_m;       // Δy (m)
-    public float deltaTheta_rad; // Δθ (rad)
+    public float poseX_m = 0f;       // Δx (m) - 초기화 추가
+    public float poseY_m = 0f;       // Δy (m) - 초기화 추가
+    public float poseTheta_rad = 0f; // Δθ (rad) - 초기화 추가
 }

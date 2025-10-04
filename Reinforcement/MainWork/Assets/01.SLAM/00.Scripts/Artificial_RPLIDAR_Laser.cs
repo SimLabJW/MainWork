@@ -141,9 +141,9 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
         }
 
         sb.AppendFormat("POSE,{0:F4},{1:F4},{2:F4}\n",
-            GameManager.s_agent.deltaX_m,
-            GameManager.s_agent.deltaY_m,
-            GameManager.s_agent.deltaTheta_rad);
+            GameManager.s_agent.poseX_m,
+            GameManager.s_agent.poseY_m,
+            GameManager.s_agent.poseTheta_rad);
         // 한 프레임(360도) 데이터로 lidarData 생성 후 1회 전송
         string SLAM_Data = sb.ToString();
         if (GameManager.s_comm.s_comm_Coroutine == null )

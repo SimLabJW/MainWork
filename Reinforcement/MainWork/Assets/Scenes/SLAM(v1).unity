@@ -862,7 +862,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanFrequencyHz: 8
   pointsPerScan: 1450
-  maxDistance: 80
+  maxDistance: 40
   minDistance: 0.15
   lidarOrigin: {fileID: 362737991}
 --- !u!114 &101331149
@@ -6740,6 +6740,9 @@ PrefabInstance:
     - {fileID: 5886083173233330257, guid: c447025b815cf9d49bf7392b164b086e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3871355499333534635, guid: c447025b815cf9d49bf7392b164b086e, type: 3}
+      insertIndex: 0
+      addedObject: {fileID: 1989294376}
     - targetCorrespondingSourceObject: {fileID: 2403103649562724374, guid: c447025b815cf9d49bf7392b164b086e, type: 3}
       insertIndex: 0
       addedObject: {fileID: 362737991}
@@ -8924,11 +8927,11 @@ Transform:
   m_GameObject: {fileID: 1989294373}
   serializedVersion: 2
   m_LocalRotation: {x: 0.17784935, y: -0.006660688, z: 0.0015987572, w: 0.9840339}
-  m_LocalPosition: {x: 158.84442, y: 9.178831, z: 7.2297153}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.00465393, y: 6.2159343, z: -6.018984}
+  m_LocalScale: {x: 0.8333332, y: 0.8333333, z: 0.8333333}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1585152600}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1989294377
 MonoBehaviour:
@@ -10722,7 +10725,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1713802226}
-  - {fileID: 1989294376}
   - {fileID: 771539408}
   - {fileID: 1980759592}
   - {fileID: 1284874614}

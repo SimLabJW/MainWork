@@ -17,7 +17,6 @@ public class AgentKeyboard : MonoBehaviour
     {
         prevPosition = transform.position;
         prevRotationY = transform.eulerAngles.y;
-
         controlCoroutine = StartCoroutine(KeyboardControlLoop());
     }
 
@@ -81,9 +80,12 @@ public class AgentKeyboard : MonoBehaviour
         float deltaTheta_rad = deltaYawDeg * Mathf.Deg2Rad;
 
         // GameManager에 기록
-        GameManager.s_agent.deltaX_m = deltaX_m;
-        GameManager.s_agent.deltaY_m = deltaY_m;
-        GameManager.s_agent.deltaTheta_rad = deltaTheta_rad;
+        // GameManager.s_agent.poseX_m += deltaX_m;
+        // GameManager.s_agent.poseY_m += deltaY_m;
+        GameManager.s_agent.poseX_m += deltaY_m;
+        GameManager.s_agent.poseY_m += deltaX_m;
+        GameManager.s_agent.poseTheta_rad = deltaTheta_rad;
+
 
         prevPosition = currPos;
         prevRotationY = currYawDeg;

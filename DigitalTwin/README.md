@@ -71,6 +71,7 @@ sudo vi /etc/xrdp/startwm.sh
 
 unset DBUS_SESSION_BUS_ADDRESS
 unset XDG_RUNTIME_DIR
+.$HOME/.profile
 
 test -x /etc/X11/Xsession && exec /etc/X11/Xsession
 exec /bin/sh /etc/X11/Xsession
