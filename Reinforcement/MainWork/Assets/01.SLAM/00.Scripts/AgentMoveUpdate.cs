@@ -2,159 +2,175 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AgentAnimation : MonoBehaviour
+public class AgentMoveUpdate : MonoBehaviour
 {
     public Rigidbody rigid;
     public WheelCollider wheel1, wheel2, wheel3, wheel4;
     public float drivespeed, steerspeed;
     public float rotationSpeed = 30.0f;
 
-    private Coroutine moveCoroutine;
-    private Coroutine TrainDoneCoroutine;
+    [Header("Path Following Params")]
+    public float linearSpeed = 1.0f;        // m/s
+    public float angularSpeedDeg = 180f;    // deg/s
+    public float waypointArriveDist = 0.10f;// m (도착 판정)
+    public float slowDownRadius = 0.50f;    // m (가까워지면 감속)
+    public float lookAheadTurnDeg = 5f;
 
-    public void Start()
+    private Coroutine rlMoveCoroutine;
+
+    private Vector3 prevPosition;
+    private float prevRotationY;
+
+    Vector3 anchorPosWorld;
+
+    private void Awake() 
     {
-        // TestGameManager.Test_Agent.OnMoveTraining -= UpdateMovementData;
-        // TestGameManager.Test_Agent.OnMoveTraining += UpdateMovementData; 
+        prevPosition = transform.position;
+        prevRotationY = transform.eulerAngles.y;
 
-        // TestGameManager.Test_Agent.Reset_device -= Reset_Agent;
-        // TestGameManager.Test_Agent.Reset_device += Reset_Agent;
+        anchorPosWorld = transform.position;     
 
-        // TestGameManager.Test_Agent.OnMoveTrainingDone -= ApplyMovementData;
-        // TestGameManager.Test_Agent.OnMoveTrainingDone += ApplyMovementData;
-
+        UpdateDeltaPose();
+    }
+    void Start()
+    {
+        GameManager.s_agent.MoveUpdateAgent -= ApplyRLCommands;
+        GameManager.s_agent.MoveUpdateAgent += ApplyRLCommands;
     }
 
-    public void UpdateMovementData(int nx, int nz, int angle)
+    // RL 명령 리스트를 받아 순차적으로 실행하는 함수
+    public void ApplyRLCommands(List<Vector3> waypoints)
     {
-        // 새로운 이동 코루틴이 실행 중이라면 중지하고 새로 시작
-        if (moveCoroutine != null)
+        if (rlMoveCoroutine != null)
+            StopCoroutine(rlMoveCoroutine);
+
+        rlMoveCoroutine = StartCoroutine(ExecuteRLCommands(waypoints));
+    }
+
+    // y=0으로 납작하게
+    Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
+
+    private IEnumerator ExecuteRLCommands(List<Vector3> waypointsFromPython)
+    {
+        var waypointsWorld = new List<Vector3>(waypointsFromPython.Count);
+        float yKeep = transform.position.y; // 높이 유지
+        for (int i = 0; i < waypointsFromPython.Count; i++)
         {
-            StopCoroutine(moveCoroutine);
+            Vector3 p = waypointsFromPython[i];
+
+            float worldX = anchorPosWorld.x + p.z; // y => X
+            float worldZ = anchorPosWorld.z + p.x; // x => Z
+
+            waypointsWorld.Add(new Vector3(worldX, yKeep, worldZ));
         }
 
-        // 에이전트에 주어진 위치로 즉시 이동
-        moveCoroutine = StartCoroutine(ProcessMovement(nx, nz, angle));
-    }
+        int startIdx = 0;
 
-    private IEnumerator ProcessMovement(int targetX, int targetZ, int targetAngle)
-    {
-        yield return StartCoroutine(RotateAgent(targetAngle));
-        yield return StartCoroutine(MoveAgent(targetX, targetZ));
-        FinalizeMovement();
-    }
-
-    // 에이전트 회전 처리
-    private IEnumerator RotateAgent(float targetAngle)
-    {
-        // 각도 제한 (유효 범위 내로)
-        targetAngle = Mathf.Clamp(targetAngle, -90, 180);
-        transform.eulerAngles = new Vector3(0, targetAngle, 0);
-        yield return null;  // 회전 완료 후
-    }
-
-    // 에이전트 위치 이동 처리
-    private IEnumerator MoveAgent(int targetX, int targetZ)
-    {
-        Vector3 newPosition = new Vector3(targetX, transform.position.y, targetZ);
-        transform.position = newPosition;
-        yield return null;  // 이동 완료 후
-    }
-
-    // 이동 완료 처리
-    private void FinalizeMovement()
-    {
-        // TestGameManager.Test_Agent.agent_position_x = transform.position.x;
-        // TestGameManager.Test_Agent.agent_position_z = transform.position.z;
-        // TestGameManager.Test_Agent.agent_angle = transform.eulerAngles.y;
-
-        // TestGameManager.Test_Agent.OnMovementComplete?.Invoke();
-    }
-
-
-    public void ApplyMovementData(int targetX, int targetZ, int targetAngle)
-    {
-        if (TrainDoneCoroutine != null)
+        GameManager.s_agent.AgentState = GameManager.s_agent.RenewalState;
+        for (int i = startIdx; i < waypointsWorld.Count; i++)
         {
-            StopCoroutine(TrainDoneCoroutine);
-        }
-        TrainDoneCoroutine = StartCoroutine(MoveForPosition(targetX, targetZ, targetAngle));
-    }
-
-    private IEnumerator MoveForPosition(int targetX, int targetZ, int targetAngle)
-    {
-        Vector3 startPosition = transform.position;
-        Vector3 targetPosition = new Vector3(targetX, transform.position.y, targetZ);
-
-        float startAngle = transform.eulerAngles.y;
-        float targetRotationAngle = targetAngle;
-
-        bool rotationComplete = false;
-        bool distanceComplete = false;
-
-        // 회전 애니메이션 처리
-        while (!rotationComplete)
-        {
-            float currentAngle = Mathf.MoveTowardsAngle(transform.eulerAngles.y, targetRotationAngle, rotationSpeed * Time.deltaTime);
-            transform.eulerAngles = new Vector3(0, currentAngle, 0);
-
-            // 회전 완료 여부 체크
-            if (Mathf.Abs(currentAngle - targetRotationAngle) < 0.1f)
+            if (i == waypointsWorld.Count -1)
             {
-                rotationComplete = true;
+                GameManager.s_agent.AgentState = GameManager.s_agent.ProcessState;
             }
-            yield return null; // 한 프레임 대기
+            yield return StartCoroutine(ExecuteSingleCommand(waypointsWorld[i]));
         }
+        
 
-        // 위치 이동
-        while (!distanceComplete)
+        StopMovement();
+        UpdateDeltaPose();                       // 완료 후 한 번 더
+        // GameManager.s_agent.StartLidar?.Invoke();
+        rlMoveCoroutine = null;
+    } 
+
+    private IEnumerator ExecuteSingleCommand(Vector3 waypointWorld)
+    {
+        // var wait = new WaitForFixedUpdate();
+
+        const float posEps = 1e-4f; // 수치적 오차 허용(거의 0)
+
+        while (true)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, drivespeed * Time.deltaTime);
+            // 수평 좌표만 사용
+            Vector3 posFlat = Flat(transform.position);
+            Vector3 wpFlat  = Flat(waypointWorld);
+            Vector3 to      = wpFlat - posFlat;
+            float   dist    = to.magnitude;
 
-            // 이동 완료 여부 체크
-            if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+            // 1) 위치가 사실상 같으면(수치 오차 수준) 정확히 스냅하고 종료
+            if (dist <= posEps)
             {
-                distanceComplete = true;
+                // 최종 스냅(정확히 목표 좌표로)
+                rigid.MovePosition(new Vector3(wpFlat.x, rigid.position.y, wpFlat.z));
+                yield break;
             }
-            yield return null; // 한 프레임 대기
-        }
 
-        StopMovement(); // 이동 정지
-        TrainDoneCoroutine = null;
+            // 2) 목표 방향으로 회전(yaw만)
+            Vector3 dirFlat = to / dist; // normalized
+            float targetYaw = Mathf.Atan2(dirFlat.x, dirFlat.z) * Mathf.Rad2Deg;
+            Quaternion targetRot = Quaternion.Euler(0f, targetYaw, 0f);
+            Quaternion newRot = Quaternion.RotateTowards(
+                rigid.rotation, targetRot, angularSpeedDeg * Time.fixedDeltaTime
+            );
+            rigid.MoveRotation(newRot);
+
+
+            float speed = linearSpeed;
+
+            float headingErr = Vector3.SignedAngle(Flat(rigid.transform.forward).normalized, dirFlat, Vector3.up);
+            float forwardScale = (Mathf.Abs(headingErr) < lookAheadTurnDeg) ? 1.0f : 0.25f;
+
+            float maxStep = speed * forwardScale * Time.fixedDeltaTime;
+
+            float stepLen = Mathf.Min(maxStep, dist);  
+            Vector3 nextFlat = posFlat + dirFlat * stepLen;
+
+            // 5) 이동
+            rigid.MovePosition(new Vector3(nextFlat.x, rigid.position.y, nextFlat.z));
+
+            UpdateDeltaPose();
+            GameManager.s_agent.StartLidar?.Invoke();
+
+            yield return new WaitForSeconds(0.01f);
+        }
     }
 
     private void StopMovement()
     {
-        // 모든 바퀴 토크와 조향을 0으로 설정하여 이동 정지
         wheel1.motorTorque = 0;
         wheel2.motorTorque = 0;
         wheel3.motorTorque = 0;
         wheel4.motorTorque = 0;
+
         wheel1.steerAngle = 0;
         wheel2.steerAngle = 0;
 
-        // Rigidbody의 속도와 각속도를 0으로 설정하여 완전 정지
         rigid.velocity = Vector3.zero;
         rigid.angularVelocity = Vector3.zero;
 
-        // TestGameManager.Test_Agent.agent_position_x = transform.position.x;
-        // TestGameManager.Test_Agent.agent_position_z = transform.position.z;
-        // TestGameManager.Test_Agent.agent_angle = transform.eulerAngles.y;
-
-        // TestGameManager.Test_Agent.OnMovementComplete?.Invoke();
+        
     }
 
+    private void UpdateDeltaPose()
+    {
+        Vector3 currPos = transform.position;
+        float currYawDeg = transform.eulerAngles.y;
 
+        // Δ위치
+        Vector3 deltaPos = currPos - prevPosition;
+        float deltaX_m = deltaPos.x;
+        float deltaY_m = deltaPos.z;
 
-    // private void Reset_Agent(Vector3 position, float angle)
-    // {
-    //     // 에이전트 위치와 회전을 새로운 값으로 초기화
-    //     transform.position = position;
-    //     transform.rotation = Quaternion.Euler(0, angle, 0);
+        // Δ회전
+        float deltaYawDeg = Mathf.DeltaAngle(prevRotationY, currYawDeg);
+        float deltaTheta_rad = deltaYawDeg * Mathf.Deg2Rad;
 
-    //     TestGameManager.Test_Agent.agent_position_x = transform.position.x;
-    //     TestGameManager.Test_Agent.agent_position_z = transform.position.z;
-    //     TestGameManager.Test_Agent.agent_angle = transform.rotation.y;
-  
-    // }
+        GameManager.s_agent.poseX_m += deltaY_m;
+        GameManager.s_agent.poseY_m += deltaX_m;
+        GameManager.s_agent.poseTheta_rad = deltaTheta_rad;
+
+        prevPosition = currPos;
+        prevRotationY = currYawDeg;
+        
+    }
 }

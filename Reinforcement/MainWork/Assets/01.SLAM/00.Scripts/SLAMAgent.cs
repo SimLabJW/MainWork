@@ -9,6 +9,8 @@ public class SLAMAgent : MonoBehaviour
     public Button StartLidar_Button;
     public Button CloseConnect_Button;
 
+    
+
     // Start is called before the first frame update
     void Start()
     {

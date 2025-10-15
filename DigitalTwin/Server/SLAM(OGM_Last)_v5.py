@@ -198,7 +198,7 @@ class RealtimeSLAM:
                 self.graph.add_edge([past_v.id, self.node_id - 1],
                                     measurement=measurement,
                                     information=np.identity(3))
-                print(f"🔗 Loop closure between {past_v.id} and {self.node_id-1}")
+                # print(f"🔗 Loop closure between {past_v.id} and {self.node_id-1}")
                 break
 
     # ========== 점군 누적(그림용, 선택) ==========
@@ -241,10 +241,10 @@ class RealtimeSLAM:
                         self.ogm_update_scan((x, y, theta), self.current_scan)
                         # 점군 오버레이를 쓰려면 아래 줄 주석 해제
                         # self.add_scan_to_map_points((x, y, theta), self.current_scan)
-                        print(
-                            f"POSE {x:.2f}, {y:.2f}, {theta:.2f} | "
-                            f"Added {len(self.current_scan)} scan points"
-                        )
+                        # print(
+                        #     f"POSE {x:.2f}, {y:.2f}, {theta:.2f} | "
+                        #     f"Added {len(self.current_scan)} scan points"
+                        # )
                         self.current_scan = []
 
                     # Graph-SLAM 업데이트

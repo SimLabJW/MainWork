@@ -8,7 +8,7 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
     [Header("LIDAR Settings")]
     public float scanFrequencyHz = 8f;
     public int pointsPerScan = 1450;
-    public float maxDistance = 20f;
+    public float maxDistance = 40f;
     public float minDistance = 0.15f;
 
     [Header("Scan Origin")]
@@ -27,11 +27,11 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
 
     void Start_ArtifitalLidar()
     {
-        // 이미 실행 중이면 중복 실행 방지
-        if (GameManager.s_agent.scanCoroutine == null)
+        if (GameManager.s_agent.scanCoroutine != null)
         {
-            GameManager.s_agent.scanCoroutine = StartCoroutine(ScanRoutine());
+            StopCoroutine(GameManager.s_agent.scanCoroutine);
         }
+        GameManager.s_agent.scanCoroutine = StartCoroutine(ScanRoutine());
     }
 
     public void StopArtificialLidar()
@@ -54,11 +54,10 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
     IEnumerator ScanRoutine()
     {
         float scanInterval = 1f / scanFrequencyHz;
-        while (true)
-        {
-            PerformScan();
-            yield return new WaitForSeconds(scanInterval);
-        }
+        
+        PerformScan();
+        yield return new WaitForSeconds(scanInterval);
+
     }
 
     void PerformScan()
@@ -139,16 +138,23 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
             sb.AppendFormat("{0:F4},{1:F1},{2:F0}\n", angleRad, distance_mm, intensity);
 
         }
-
         sb.AppendFormat("POSE,{0:F4},{1:F4},{2:F4}\n",
             GameManager.s_agent.poseX_m,
             GameManager.s_agent.poseY_m,
             GameManager.s_agent.poseTheta_rad);
-        // 한 프레임(360도) 데이터로 lidarData 생성 후 1회 전송
+
+        sb.AppendFormat($"{GameManager.s_agent.AgentState}\n");
+
+        StartCoroutine(FormulationData(sb));
+    }
+
+    IEnumerator FormulationData(StringBuilder sb)
+    {
         string SLAM_Data = sb.ToString();
         if (GameManager.s_comm.s_comm_Coroutine == null )
         {
             GameManager.s_comm.s_comm_Coroutine = StartCoroutine(GameManager.s_comm.RequestLoop(SLAM_Data));
+            yield return null;
         }
     }
 }
