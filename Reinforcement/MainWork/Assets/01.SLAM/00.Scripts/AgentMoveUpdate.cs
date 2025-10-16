@@ -129,9 +129,10 @@ public class AgentMoveUpdate : MonoBehaviour
             rigid.MovePosition(new Vector3(nextFlat.x, rigid.position.y, nextFlat.z));
 
             UpdateDeltaPose();
-            GameManager.s_agent.StartLidar?.Invoke();
+            
+            yield return new WaitForSeconds(0.05f);
 
-            yield return new WaitForSeconds(0.01f);
+            GameManager.s_agent.StartLidar?.Invoke();
         }
     }
 

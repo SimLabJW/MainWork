@@ -94,7 +94,7 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
                         distance_mm = maxDistance * 1000f;
                         intensity = 0f;
                         hitName = "IgnoreOutput";
-                        Debug.DrawLine(lidarOrigin.position, hit.point, Color.yellow, 1f);
+                        // Debug.DrawLine(lidarOrigin.position, hit.point, Color.yellow, 1f);
                     }
                     else
                     {
@@ -109,7 +109,7 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
 
                         hitName = hit.collider.name;
 
-                        Debug.DrawLine(lidarOrigin.position, hit.point, Color.red, 1f);
+                        // Debug.DrawLine(lidarOrigin.position, hit.point, Color.red, 1f);
                     }
                 }
                 else
@@ -120,7 +120,7 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
                     intensity = 0f;
                     hitName = "TooClose";
                     Vector3 endPoint = lidarOrigin.position + direction * minDistance;
-                    Debug.DrawLine(lidarOrigin.position, endPoint, Color.cyan, 1f);
+                    // Debug.DrawLine(lidarOrigin.position, endPoint, Color.cyan, 1f);
                 }
             }
             else
@@ -131,7 +131,7 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
                 intensity = 0f;
                 hitName = "None";
                 Vector3 endPoint = lidarOrigin.position + direction * maxDistance;
-                Debug.DrawLine(lidarOrigin.position, endPoint, Color.green, 1f);
+                // Debug.DrawLine(lidarOrigin.position, endPoint, Color.green, 1f);
             }
             
             // 누적 수집: theta(rad),distance(mm),intensity

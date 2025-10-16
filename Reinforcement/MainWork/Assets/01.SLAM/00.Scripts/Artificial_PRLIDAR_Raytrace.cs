@@ -126,16 +126,6 @@ public class Artificial_PRLIDAR_Raytrace : MonoBehaviour
 
                     string json = JsonUtility.ToJson(msg);
 
-                    // 👉 GameManager 통신 루프 (한 바퀴마다 전송)
-                    // if (GameManager.s_comm.s_comm_Coroutine == null)
-                    // {
-                    //     GameManager.s_comm.s_comm_Coroutine = StartCoroutine(GameManager.s_comm.RequestLoop(json));
-                    // }
-                    // else
-                    // {
-                    //     GameManager.s_comm.latestData = json;
-                    // }
-
                     // 다음 스캔을 위해 배열 초기화
                     ranges = new float[pointsPerScan];
                     intensities = new float[pointsPerScan];
