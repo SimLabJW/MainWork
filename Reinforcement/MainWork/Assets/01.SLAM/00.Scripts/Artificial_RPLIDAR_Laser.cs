@@ -56,7 +56,8 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
         float scanInterval = 1f / scanFrequencyHz;
         
         PerformScan();
-        yield return new WaitForSeconds(scanInterval);
+        // yield return new WaitForSeconds(scanInterval);
+        yield return null;
 
     }
 
@@ -145,16 +146,18 @@ public class Artificial_RPLIDAR_Laser : MonoBehaviour
 
         sb.AppendFormat($"{GameManager.s_agent.AgentState}\n");
 
-        StartCoroutine(FormulationData(sb));
+        FormulationData(sb);
+
     }
 
-    IEnumerator FormulationData(StringBuilder sb)
+    void FormulationData(StringBuilder sb)
     {
         string SLAM_Data = sb.ToString();
-        if (GameManager.s_comm.s_comm_Coroutine == null )
+        // StartCoroutine(GameManager.s_comm.RequestLoop(SLAM_Data));
+        if (GameManager.s_comm.s_comm_Coroutine == null)
         {
-            GameManager.s_comm.s_comm_Coroutine = StartCoroutine(GameManager.s_comm.RequestLoop(SLAM_Data));
-            yield return null;
+            // StartCoroutine은 이 MonoBehaviour 클래스(Artificial_RPLIDAR_Laser)의 것
+            GameManager.s_comm.s_comm_Coroutine = StartCoroutine(GameManager.s_comm.RequestLoop(SLAM_Data)); 
         }
     }
 }

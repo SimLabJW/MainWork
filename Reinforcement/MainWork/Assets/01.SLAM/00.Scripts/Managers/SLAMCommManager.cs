@@ -34,61 +34,77 @@ public class SLAMCommManager
 
     public IEnumerator RequestLoop(string data) // Unity -> Python
     {
-        if (isShuttingDown || reqSocket == null) yield break;
-        try { reqSocket.SendFrame(data); Debug.Log($"Send to Python");} catch { yield break; }
+        if (GameManager.s_agent.AgentState == "PROCESS")
+        { Debug.Log($"In requestLoop : {data}"); }
 
-        WaitForSeconds delay = new WaitForSeconds(0.05f); // 20Hz 폴링
-
-        while (!isShuttingDown)
+        if (isShuttingDown || reqSocket == null)
         {
-            if (reqSocket == null) break;
+            yield break;
+        }
 
-            if (reqSocket.TryReceiveFrameString(out string reply))
+        try
+        {
+            // 1. Send (요청)
+            try { reqSocket.SendFrame(data); }
+            catch
             {
-                Debug.Log("Receive Python Data");
-                var jObject = JObject.Parse(reply);
-                Debug.Log("서버응답 : " + jObject);
-
-                var resultObj = jObject["result"] as JObject;   // result 객체
-                string status = (string)resultObj?["status"];   // status 문자열 안전 추출
-
-                if (status == "continue")
-                {
-                    var jPath = resultObj?["path"] as JArray;
-                    if (jPath != null)
-                    {
-                        var waypoints = new List<Vector3>(jPath.Count);
-                        foreach (var p in jPath)
-                        {
-                            float x = p[0].Value<float>();
-                            float y = p[1].Value<float>();
-                            waypoints.Add(new Vector3(x, 0f, y));
-                        }
-
-                        // s_agent가 null이면 여기서도 NRE 날 수 있음 → 가드
-                        if (GameManager.s_agent != null)
-                            GameManager.s_agent.MoveUpdateEvent(waypoints);
-                        else
-                            Debug.LogWarning("GameManager.s_agent is null");
-                    }
-                    break;
-                }
-                else if (status == "renewal")
-                {
-                    break;
-                }
-                else
-                {
-                    Debug.LogWarning($"알 수 없는 status: {status}");
-                }
-
-                
+                if (GameManager.s_agent.AgentState == "PROCESS")
+                { Debug.Log($"miss the data : {data}"); }
+                yield break; // Send 실패 시 finally로 이동
             }
 
-            yield return delay;
+            // 2. Receive (응답 대기)
+            while (!isShuttingDown)
+            {
+                if (reqSocket == null) break;
+
+                if (reqSocket.TryReceiveFrameString(out string reply))
+                {
+                    var jObject = JObject.Parse(reply);
+                    var resultObj = jObject["result"] as JObject;
+                    string status = (string)resultObj?["status"];
+
+                    // ... (status 처리 로직은 그대로 유지) ...
+                    if (status == "continue")
+                    {
+                        var jPath = resultObj?["path"] as JArray;
+                        if (jPath != null)
+                        {
+                            var waypoints = new List<Vector3>(jPath.Count);
+                            foreach (var p in jPath)
+                            {
+                                float x = p[0].Value<float>();
+                                float y = p[1].Value<float>();
+                                waypoints.Add(new Vector3(x, 0f, y));
+                            }
+
+                            GameManager.s_agent.MoveUpdateEvent(waypoints);
+                        }
+                        yield break; // 성공적인 응답 후 종료
+                    }
+                    else if (status == "renewal")
+                    {
+                        yield break; // 성공적인 응답 후 종료
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"알 수 없는 status: {status}");
+                        yield break;
+                    }
+                }
+
+                yield return null; // 응답이 없으면 다음 프레임까지 대기
+            }
         }
-        s_comm_Coroutine = null;
+        finally
+        {
+            GameManager.s_comm.s_comm_Coroutine = null;
+        }
+
+        yield break;
     }
+
+
 
     public void OnApplicationQuit()
     {

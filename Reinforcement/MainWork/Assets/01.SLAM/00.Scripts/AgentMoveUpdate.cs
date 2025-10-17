@@ -41,10 +41,7 @@ public class AgentMoveUpdate : MonoBehaviour
     // RL 명령 리스트를 받아 순차적으로 실행하는 함수
     public void ApplyRLCommands(List<Vector3> waypoints)
     {
-        if (rlMoveCoroutine != null)
-            StopCoroutine(rlMoveCoroutine);
-
-        rlMoveCoroutine = StartCoroutine(ExecuteRLCommands(waypoints));
+        StartCoroutine(ExecuteRLCommands(waypoints));
     }
 
     // y=0으로 납작하게
@@ -69,43 +66,75 @@ public class AgentMoveUpdate : MonoBehaviour
         GameManager.s_agent.AgentState = GameManager.s_agent.RenewalState;
         for (int i = startIdx; i < waypointsWorld.Count; i++)
         {
-            if (i == waypointsWorld.Count -1)
+            if (i == waypointsWorld.Count-1)
             {
+                // 마지막 웨이포인트에 도달하면 상태를 PROCESS로 변경
                 GameManager.s_agent.AgentState = GameManager.s_agent.ProcessState;
             }
-            yield return StartCoroutine(ExecuteSingleCommand(waypointsWorld[i]));
+            yield return StartCoroutine(ExecuteSingleCommand(waypointsWorld[i])); // 이동 + 통신/대기 수행
+            
+            // ExecuteSingleCommand가 Waypoint 도착으로 인해 종료되었을 때, 
+            // 혹시 아직 처리되지 않은 통신이 있다면 여기서 한번 더 대기 (안전망)
+            // while (GameManager.s_comm.s_comm_Coroutine != null)
+            // {
+            //     yield return null;
+            // }
+        }
+
+        while (GameManager.s_comm.s_comm_Coroutine != null)
+        {
+            yield return null;
+        }
+
+        // ⭐ 최종 PROCESS 상태 전송 보장 (ExecuteSingleCommand가 마지막 통신을 놓쳤을 경우를 대비)
+        if (GameManager.s_agent.AgentState == GameManager.s_agent.ProcessState)
+        {
+            UpdateDeltaPose();
+            GameManager.s_agent.StartLidar?.Invoke();
+            
+            // PROCESS 데이터의 응답이 올 때까지 명시적으로 대기
+            while (GameManager.s_comm.s_comm_Coroutine != null)
+            {
+                yield return null;
+            }
         }
         
-
-        StopMovement();
-        UpdateDeltaPose();                       // 완료 후 한 번 더
-        // GameManager.s_agent.StartLidar?.Invoke();
-        rlMoveCoroutine = null;
+        yield break;
     } 
 
     private IEnumerator ExecuteSingleCommand(Vector3 waypointWorld)
     {
-        // var wait = new WaitForFixedUpdate();
+        Vector3 targetPosition = new Vector3(waypointWorld.x, transform.position.y, waypointWorld.z);
 
-        const float posEps = 1e-4f; // 수치적 오차 허용(거의 0)
-
+        bool isFirstLidarCall = true;
+        
         while (true)
         {
-            // 수평 좌표만 사용
+            UpdateDeltaPose();
+            if (isFirstLidarCall || GameManager.s_comm.s_comm_Coroutine == null)
+            {
+                isFirstLidarCall = false; 
+                yield return new WaitForSeconds(0.05f); 
+                GameManager.s_agent.StartLidar?.Invoke(); // LIDAR 스캔 -> RequestLoop 호출
+            }
+            else
+            {
+ 
+                yield return new WaitForSeconds(0.05f); 
+            }
+
+            
+            
+            if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+            {
+                yield break;
+            }
+            
             Vector3 posFlat = Flat(transform.position);
             Vector3 wpFlat  = Flat(waypointWorld);
             Vector3 to      = wpFlat - posFlat;
             float   dist    = to.magnitude;
 
-            // 1) 위치가 사실상 같으면(수치 오차 수준) 정확히 스냅하고 종료
-            if (dist <= posEps)
-            {
-                // 최종 스냅(정확히 목표 좌표로)
-                rigid.MovePosition(new Vector3(wpFlat.x, rigid.position.y, wpFlat.z));
-                yield break;
-            }
-
-            // 2) 목표 방향으로 회전(yaw만)
             Vector3 dirFlat = to / dist; // normalized
             float targetYaw = Mathf.Atan2(dirFlat.x, dirFlat.z) * Mathf.Rad2Deg;
             Quaternion targetRot = Quaternion.Euler(0f, targetYaw, 0f);
@@ -114,43 +143,15 @@ public class AgentMoveUpdate : MonoBehaviour
             );
             rigid.MoveRotation(newRot);
 
-
-            float speed = linearSpeed;
-
-            float headingErr = Vector3.SignedAngle(Flat(rigid.transform.forward).normalized, dirFlat, Vector3.up);
-            float forwardScale = (Mathf.Abs(headingErr) < lookAheadTurnDeg) ? 1.0f : 0.25f;
-
-            float maxStep = speed * forwardScale * Time.fixedDeltaTime;
-
-            float stepLen = Mathf.Min(maxStep, dist);  
-            Vector3 nextFlat = posFlat + dirFlat * stepLen;
-
-            // 5) 이동
-            rigid.MovePosition(new Vector3(nextFlat.x, rigid.position.y, nextFlat.z));
-
-            UpdateDeltaPose();
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, drivespeed * Time.deltaTime);
             
-            yield return new WaitForSeconds(0.05f);
-
-            GameManager.s_agent.StartLidar?.Invoke();
+            // while (GameManager.s_comm.s_comm_Coroutine != null)
+            // {
+            //     yield return null; 
+            // }
         }
     }
 
-    private void StopMovement()
-    {
-        wheel1.motorTorque = 0;
-        wheel2.motorTorque = 0;
-        wheel3.motorTorque = 0;
-        wheel4.motorTorque = 0;
-
-        wheel1.steerAngle = 0;
-        wheel2.steerAngle = 0;
-
-        rigid.velocity = Vector3.zero;
-        rigid.angularVelocity = Vector3.zero;
-
-        
-    }
 
     private void UpdateDeltaPose()
     {
