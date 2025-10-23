@@ -34,9 +34,6 @@ public class SLAMCommManager
 
     public IEnumerator RequestLoop(string data) // Unity -> Python
     {
-        if (GameManager.s_agent.AgentState == "PROCESS")
-        { Debug.Log($"In requestLoop : {data}"); }
-
         if (isShuttingDown || reqSocket == null)
         {
             yield break;

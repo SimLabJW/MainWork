@@ -9,6 +9,8 @@ public class SLAMAgent : MonoBehaviour
     public Button StartLidar_Button;
     public Button CloseConnect_Button;
 
+    public Button MakeGridmap_Button;
+    public Button Capture_Button;
     
 
     // Start is called before the first frame update
@@ -22,6 +24,11 @@ public class SLAMAgent : MonoBehaviour
 
         if (CloseConnect_Button != null)
             CloseConnect_Button.onClick.AddListener(OffConnectSocketButtonClicked);
+
+        if (MakeGridmap_Button != null)
+            MakeGridmap_Button.onClick.AddListener(OnMakeGridMapButtonClicked);
+        if (Capture_Button != null)
+            Capture_Button.onClick.AddListener(OnCaptureButtonClicked);
     }
 
     void OnConnectSocketButtonClicked()
@@ -41,6 +48,18 @@ public class SLAMAgent : MonoBehaviour
     {
         Debug.Log("Lidar 시작 버튼이 눌렸습니다.");
         GameManager.s_agent.LidarStartEvent();
+    }
+
+    // ----------
+    void OnMakeGridMapButtonClicked()
+    {
+        Debug.Log("make grid 시작 버튼이 눌렸습니다.");
+        GameManager.s_map.StartMakingEvent();
+    }
+    void OnCaptureButtonClicked()
+    {
+        Debug.Log("make grid 시작 버튼이 눌렸습니다.");
+        GameManager.s_map.CapturingEvnet();
     }
 
 }

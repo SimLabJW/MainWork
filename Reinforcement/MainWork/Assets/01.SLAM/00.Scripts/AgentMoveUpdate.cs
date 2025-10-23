@@ -124,8 +124,7 @@ public class AgentMoveUpdate : MonoBehaviour
             }
 
             
-            
-            if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+            if (Vector3.Distance(transform.position, targetPosition) < 0.05f)
             {
                 yield break;
             }
@@ -142,13 +141,34 @@ public class AgentMoveUpdate : MonoBehaviour
                 rigid.rotation, targetRot, angularSpeedDeg * Time.fixedDeltaTime
             );
             rigid.MoveRotation(newRot);
-
+            // UpdateDeltaPose();
+            // if (isFirstLidarCall || GameManager.s_comm.s_comm_Coroutine == null)
+            // {
+            //     isFirstLidarCall = false; 
+            //     yield return new WaitForSeconds(0.05f); 
+            //     GameManager.s_agent.StartLidar?.Invoke(); // LIDAR 스캔 -> RequestLoop 호출
+            // }
+            // else
+            // {
+ 
+            //     yield return new WaitForSeconds(0.05f); 
+            // }
+            
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, drivespeed * Time.deltaTime);
             
-            // while (GameManager.s_comm.s_comm_Coroutine != null)
-            // {
-            //     yield return null; 
-            // }
+            UpdateDeltaPose();
+            if (isFirstLidarCall || GameManager.s_comm.s_comm_Coroutine == null)
+            {
+                isFirstLidarCall = false; 
+                yield return new WaitForSeconds(0.01f); 
+                GameManager.s_agent.StartLidar?.Invoke(); // LIDAR 스캔 -> RequestLoop 호출
+            }
+            else
+            {
+ 
+                yield return new WaitForSeconds(0.03f); 
+            }
+            
         }
     }
 
@@ -169,6 +189,8 @@ public class AgentMoveUpdate : MonoBehaviour
 
         GameManager.s_agent.poseX_m += deltaY_m;
         GameManager.s_agent.poseY_m += deltaX_m;
+        // GameManager.s_agent.poseX_m += deltaX_m;
+        // GameManager.s_agent.poseY_m += deltaY_m;
         GameManager.s_agent.poseTheta_rad = deltaTheta_rad;
 
         prevPosition = currPos;

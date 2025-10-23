@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     SLAMAgentManager slam_agent = new SLAMAgentManager();
     public static SLAMAgentManager s_agent { get { return Instance.slam_agent; } }
 
+    SLAMMapManager slam_map = new SLAMMapManager();
+    public static SLAMMapManager s_map { get { return Instance.slam_map; } }
+
     private void Awake() 
     {
         Init();
