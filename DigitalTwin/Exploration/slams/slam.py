@@ -823,10 +823,13 @@ class RealtimeSLAM:
             export_dir = self._ensure_dir("./exports")
             ts = self._timestamp()
 
+            rx, ry, rth = map(float, self.current_pose)
+            iy, ix = self.world_to_map(rx, ry)  
+
             H, W = self.grid_logodds.shape
             res = float(self.OGM_RES)
-            x0, y0 = map(float, self.grid_origin_world)  # 맵 좌하단 월드 좌표
-
+            x0, y0 = map(float, self.grid_origin_world)
+            
             # 1) log-odds -> p_occ
             p_occ = 1.0 / (1.0 + np.exp(-self.grid_logodds))
 
@@ -849,6 +852,15 @@ class RealtimeSLAM:
             b64 = base64.b64encode(gz_bytes).decode("ascii")
 
             payload = {
+                "robot" : {
+                    "x": rx,
+                    "y": ry,
+                    "theta": rth,
+                    "map_index": {               
+                        "iy": int(iy),
+                        "ix": int(ix),
+                    },
+                },
                 "width": int(W),
                 "height": int(H),
                 "resolution": res,
