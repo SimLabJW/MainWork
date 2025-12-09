@@ -35,4 +35,11 @@ public class SLAMAgentManager
     public string RenewalState = "RENEWAL";
 
     public string AgentState = "PROCESS";
+
+
+    public Action<List<Vector3>> MoveUpdateCopyAgent;
+    public void MoveUpdateCopyEvent(List<Vector3> waypoints)
+    {
+        MoveUpdateCopyAgent?.Invoke(waypoints);
+    }
 }

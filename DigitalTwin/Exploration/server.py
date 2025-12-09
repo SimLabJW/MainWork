@@ -3,7 +3,7 @@ import time
 import signal
 import sys
 
-from slams.slam import RealtimeSLAM
+from slams.slam_real import RealtimeSLAM
 
 class ZMQReqRepHandler:
 

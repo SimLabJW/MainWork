@@ -114,13 +114,13 @@ public class AgentMoveUpdate : MonoBehaviour
             if (isFirstLidarCall || GameManager.s_comm.s_comm_Coroutine == null)
             {
                 isFirstLidarCall = false; 
-                yield return new WaitForSeconds(0.05f); 
+                yield return new WaitForSeconds(0.03f); 
                 GameManager.s_agent.StartLidar?.Invoke(); // LIDAR 스캔 -> RequestLoop 호출
             }
             else
             {
  
-                yield return new WaitForSeconds(0.05f); 
+                yield return new WaitForSeconds(0.03f); 
             }
 
             
@@ -160,7 +160,7 @@ public class AgentMoveUpdate : MonoBehaviour
             if (isFirstLidarCall || GameManager.s_comm.s_comm_Coroutine == null)
             {
                 isFirstLidarCall = false; 
-                yield return new WaitForSeconds(0.01f); 
+                yield return new WaitForSeconds(0.03f); 
                 GameManager.s_agent.StartLidar?.Invoke(); // LIDAR 스캔 -> RequestLoop 호출
             }
             else

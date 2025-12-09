@@ -23,6 +23,9 @@ public class Make3DBasicMap : MonoBehaviour
     public GameObject FreePrefab;
 
     public GameObject RobotPrefab;
+    public Make3DObject capture3d;
+    public Texture texture;
+
 
     private string jsonfile_path = @"D:\Code\MainWork\MainWork\DigitalTwin\Exploration\exports\gridmap_jsonfile.json";
 
@@ -135,8 +138,6 @@ public class Make3DBasicMap : MonoBehaviour
 
         int occRects = 0, freeRects = 0;
 
-        
-
         // ------------------- 1) OCCUPIED(벽/장애물) 병합 스폰 -------------------
         if (wallPf != null)
         {
@@ -167,22 +168,19 @@ public class Make3DBasicMap : MonoBehaviour
                         if (canGrow) h++;
                     }
 
-                    // 중심(로컬)과 스케일
                     float cx = (j + (w * 0.5f)) * res;
                     float cz = (i + (h * 0.5f)) * res;
 
                     var go = Instantiate(wallPf, wallsParent);
                     go.name = $"occ_rect_{i}_{j}_{w}x{h}";
 
-                    // ▶ 높이 고정 + 아래쪽으로 내려가도록 배치
                     Vector3 s = wallPf.transform.localScale;
                     s.x = w * res;
                     s.z = h * res;
-                    s.y = wallHeight;                    // 높이를 고정
+                    s.y = wallHeight;                    
                     go.transform.localScale = s;
 
-                    // yBase(=origin.z) 평면이 윗면이 되도록, 로컬 -Y 방향으로 절반만큼 내림
-                    float yTop = yBase;                  // 윗면 기준 높이(필요시 0으로 두어도 됨)
+                    float yTop = yBase;               
                     go.transform.localPosition = new Vector3(cx, yTop - (s.y * 0.5f), cz);
                     go.transform.localRotation = Quaternion.identity;
                     go.SetActive(true);
@@ -263,7 +261,8 @@ public class Make3DBasicMap : MonoBehaviour
         if (robotPf != null)
         {
             // 1) 프리팹 인스턴스 생성 (부모: OGM_Robot)
-            var rob = Instantiate(robotPf, RobotParent);
+            // var rob = Instantiate(robotPf, RobotParent);
+            GameManager.s_map.CopyAgent = Instantiate(robotPf, RobotParent);
 
             // 2) 로컬 좌표 계산 (map_index 우선, 없으면 x,y 사용)
             float lx, lz;
@@ -279,31 +278,60 @@ public class Make3DBasicMap : MonoBehaviour
             }
 
             // 3) 바닥 높이 + 반높이 보정(프리팹 pivot이 중앙일 수 있음)
-            rob.transform.localPosition = new Vector3(lx, -1f, lz);
+            GameManager.s_map.CopyAgent.transform.localPosition = new Vector3(lx, -1f, lz);
 
-            rob.transform.localRotation = Quaternion.Euler(0, 90, 180);
+            GameManager.s_map.CopyAgent.transform.localRotation = Quaternion.Euler(0, 90, 180);
 
             // 4) 회전(Yaw만; 라디안)
             float theta = (float)_pkt.robot.theta;
             Vector3 dir = new Vector3(Mathf.Cos(theta), 0f, Mathf.Sin(theta));
-            // if (dir.sqrMagnitude < 1e-6f) dir = Vector3.forward;
-            // rob.transform.localRotation = Quaternion.LookRotation(dir, Vector3.up);
 
-            rob.SetActive(true);
+            GameManager.s_map.CopyAgent.SetActive(true);
 
-            // (선택) 디버그: 실제 배치 위치/회전 확인
-            Debug.Log($"[OGM] Robot placed local=({rob.transform.localPosition}) world=({rob.transform.position}) theta={theta}");
+            GameManager.s_map.CopyAgent.AddComponent<Make3DObject>();
+
+            // 로봇 안에 있는 카메라의 targetTexture를 texture로 설정
+            // 카메라를 찾기 (자식 오브젝트 포함)
+            Camera cam = GameManager.s_map.CopyAgent.GetComponentInChildren<Camera>();
+            if (cam != null && texture is RenderTexture renderTexture)
+            {
+                cam.targetTexture = renderTexture;
+            }
+            else if (cam == null)
+            {
+                Debug.LogWarning("Robot prefab에 카메라 컴포넌트가 없습니다.");
+            }
+            else if (!(texture is RenderTexture))
+            {
+                Debug.LogWarning("주어진 texture가 RenderTexture 타입이 아닙니다. 카메라 targetTexture로 할당할 수 없습니다.");
+            }
         }
-
-        
+ 
         root.transform.localRotation = Quaternion.Euler(0, 90, 180);
         var pos = root.transform.position;
         pos.z = (float)_pkt.origin.y;
         root.transform.position = pos;
 
+        GameManager.s_map.CopyMap = root.gameObject;
+        GameManager.s_map.GridData = new int[H, W];
+        for (int i = 0; i < H; i++)
+        {
+            for (int j = 0; j < W; j++)
+            {
+                byte v = _gridRaw[i * W + j];
+                if (IsOccupied(v)) GameManager.s_map.GridData[i, j] = 1;
+                else if (IsFree(v)) GameManager.s_map.GridData[i, j] = 0;
+                else GameManager.s_map.GridData[i, j] = 1; // Unknown은 일단 차단
+            }
+        }
+
+        GameManager.s_map.Origin = new Vector2((float)_pkt.origin.x, (float)_pkt.origin.y);
+        GameManager.s_map.CellSize = (float)_pkt.resolution;
+
+
+        GameManager.s_map.StartMiniMapEvent(root.gameObject);
+
         
-
-
 
         Debug.Log($"[OGM] Rect-merged: walls={occRects}, free={freeRects} (res={res})");
     }
@@ -315,15 +343,11 @@ public class Make3DBasicMap : MonoBehaviour
         return v < occThreshold;
     }
 
-
     bool IsOccupied(byte v)
     {
         if (treat255AsUnknown && v == 255) return false;
         return v >= occThreshold;
     }
-
-
-
 
 }
 
