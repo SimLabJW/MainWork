@@ -52,7 +52,7 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 ## Virtual Environment / Extended Version
 
 ### Setting
-<img src="./png/VirtualMap_experiment_robomaster.png" alt="Set" width="400" height="300"/>
+<img src="./png/VirtualMap_experiment_robomaster.png" alt="Set" width="300" height="250"/>
 
 <p align="center">
   <img src="./png/VirtualMap_Wide.png" alt="VirtualMap_Wide" width="250" height="250"/>
