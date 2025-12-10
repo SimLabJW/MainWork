@@ -78,7 +78,7 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
   <img src="./png/RealMap2.png" alt="RealMap2" width="250" height="250"/>
 </p>
 
-<hr style="border: 1px solid #000;"/>
+<hr style="border: 0.3px solid #000;"/>
 
 ### Result
 #### Virtual to Virtual
