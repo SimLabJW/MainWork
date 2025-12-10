@@ -52,18 +52,32 @@ Device : Mirobot, Turtlebot, Robomaster(추후)
 ## Virtual Environment / Extended Version
 
 ### Setting
-<img src="./png/VirtualMap_experiment_robomaster.png" alt="Set" width="300" height="250"/>
+#### Device : Robomaster EP + Raspberry pi 4
+<img src="./png/VirtualMap_experiment_robomaster.png" alt="Set" width="150" height="250"/>
 
+#### Virtual Envrionment
 <p align="center">
   <img src="./png/VirtualMap_Wide.png" alt="VirtualMap_Wide" width="250" height="250"/>
   <img src="./png/VirtualMap_Passage.png" alt="VirtualMap_Passage" width="250" height="250"/>
   <img src="./png/VirtualMap_Obstacle.png" alt="VirtualMap_Obstacle" width="250" height="195"/>
 </p>
 
+#### Real Envrionment
+<p align="center">
+  <img src="./png/RealMap1.png" alt="RealMap1" width="250" height="250"/>
+  <img src="./png/RealMap2.png" alt="RealMap2" width="250" height="250"/>
+</p>
+
 ### Result
+#### Virtual to Virtual
 <p align="center">
   <img src="./png/VirtualMap_Wide_SLAM.png" alt="VirtualMap_Wide_SLAM" width="250" height="250"/>
   <img src="./png/VirtualMap_Passage_SLAM.png" alt="VirtualMap_Passage_SLAM" width="250" height="250"/>
   <img src="./png/VirtualMap_Obstacle_SLAM.png" alt="VirtualMap_Obstacle_SLAM" width="250" height="195"/>
 </p>
 
+#### Real to Virtual
+<p align="center">
+  <img src="./png/RealMap1_SLAM.png" alt="RealMap1_SLAM" width="250" height="250"/>
+  <img src="./png/RealMap2_SLAM.png" alt="RealMap2_SLAM" width="250" height="250"/>
+</p>
