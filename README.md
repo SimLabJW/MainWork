@@ -174,6 +174,17 @@ The source code for this system is distributed across the following directories:
 
 ---
 
+## Credits
+
+The Graph-SLAM implementation in `Real2Sim/Exploration(SLAM)/slams/newslam/` uses source code from [python-graphslam](https://github.com/JeffLIrion/python-graphslam).
+
+```
+MIT License
+Copyright (c) 2019 Jeff Irion
+```
+
+---
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
